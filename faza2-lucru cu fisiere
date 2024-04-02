@@ -1,0 +1,1820 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+#include<fstream>
+#include<sstream>
+#include<string>
+#include<vector>
+#include<list>
+#include<set>
+#include<map>
+using namespace std;
+
+
+class IPlatibil
+{
+public:
+	virtual void writeToFile(fstream& f) = 0 ;
+	virtual void readFromFile(fstream& f) = 0;
+	virtual ~IPlatibil() {};
+};
+class StocIngrediente
+{
+	char* denumire = nullptr;
+	vector<int>cantitate;
+
+public:
+	StocIngrediente()
+	{
+		this->denumire = nullptr;
+	}
+
+	StocIngrediente(const char* denumire, const vector<int>& cantitate)
+	{
+		if (denumire != nullptr && strlen(denumire) > 0)
+		{
+			this->denumire = new char[strlen(denumire) + 1];
+			strcpy(this->denumire, denumire);
+			this->denumire[strlen(denumire)] = '\0';
+		}
+		else
+			this->denumire = nullptr;
+
+		this->cantitate = cantitate;
+	}
+
+	StocIngrediente(const StocIngrediente& i)
+	{
+		if (i.denumire != nullptr)
+		{
+			this->denumire = new char[strlen(i.denumire) + 1];
+			strcpy(this->denumire, i.denumire);
+			this->denumire[strlen(denumire)] = '\0';
+		}
+		else
+			this->denumire = nullptr;
+
+		this->cantitate = i.cantitate;
+	}
+
+	~StocIngrediente()
+	{
+		delete[] this->denumire;
+		cantitate.clear();
+	}
+
+	StocIngrediente& operator=(const StocIngrediente& i)
+	{
+		if (this != &i)
+		{
+			delete[] this->denumire;
+			cantitate.clear();
+			if (i.denumire != nullptr)
+			{
+				this->denumire = new char[strlen(i.denumire) + 1];
+				strcpy(this->denumire, i.denumire);
+
+			}
+			else
+				this->denumire = nullptr;
+
+			this->cantitate = i.cantitate;
+		}
+		return *this;
+	}
+
+	const char* getdenumire() const
+	{
+		return this->denumire;
+	}
+
+	void setdenumire(const char* denumirenou)
+	{
+		if (denumirenou != nullptr && strlen(denumirenou) > 0)
+		{
+			delete[] denumire;
+			this->denumire = new char[strlen(denumirenou) + 1];
+			strcpy(this->denumire, denumirenou);
+		}
+		else
+			throw exception("eroare");
+	}
+
+	const vector<int>& getcantitate(int index) const
+	{
+		return this->cantitate;
+	}
+
+	void setCantitate(vector<int>& cantitateNoua)
+	{
+		this->cantitate = cantitateNoua;
+	}
+
+	//operatorul de comparatie ==
+	bool operator==(const StocIngrediente& s)
+	{
+		if (this->cantitate != s.cantitate)
+			return false;
+		if (this->denumire != s.denumire)
+			return false;
+
+		return true;
+	}
+
+	bool operator>(const StocIngrediente& s)
+	{
+		if (!this->cantitate.empty() && !s.cantitate.empty())
+		{
+			if (this->cantitate.back() > s.cantitate.back())
+				return true;
+			return false;
+		}
+		else
+			throw exception("Vectorul este gol");
+	}
+
+
+
+	friend ostream& operator<<(ostream& out, const StocIngrediente& i)
+	{
+		out << "\n--------------------------------------";
+		if (i.denumire != nullptr && strlen(i.denumire) > 0)
+			out << "\n Denumirea ingredientelor=" << i.denumire;
+		else
+			out << "\n denumire=-";
+		vector < int>::const_iterator   iS;
+		out << "\n Cantitatea pentru fiecare ingredient este=";
+		if (!i.cantitate.empty())
+		{
+			for (iS = i.cantitate.begin(); iS != i.cantitate.end(); iS++)
+				out << *iS << " ";
+		}
+		else
+			out << "\n nu exista cantitate";
+
+		return out;
+	}
+
+	friend ofstream& operator<<(ofstream& out, const StocIngrediente& i)
+	{
+		if (i.denumire != nullptr && strlen(i.denumire) > 0)
+			out << i.denumire << " ";
+		out << endl;
+		vector < int>::const_iterator iS;
+		if (!i.cantitate.empty())
+		{
+			for (iS = i.cantitate.begin(); iS != i.cantitate.end(); iS++)
+			{
+				int valoare = *iS;
+				out << valoare << " ";
+			}
+		}
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, StocIngrediente& i)
+	{
+		delete[] i.denumire;
+		i.denumire = nullptr;
+		i.cantitate.clear();
+
+		cout << "\n denumire=";
+		string buffer;
+		in >> buffer;
+		i.denumire = new char[buffer.size() + 1];
+		strcpy(i.denumire, buffer.data());
+
+		cout << "\n Cantitatea pentru fiecare ingredient=";
+		int can;
+		while (in >> can)
+		{
+			i.cantitate.push_back(can);
+		}
+		return in;
+	}
+
+	friend ifstream& operator>>(ifstream& in, StocIngrediente& i)
+	{
+
+		string buffer;
+		getline(in, buffer);
+		i.denumire = new char[buffer.size() + 1];
+		strcpy(i.denumire, buffer.data());
+
+		i.cantitate.clear();
+		int can;
+		while (in >> can)
+		{
+			i.cantitate.push_back(can);
+		}
+		in.clear();
+
+		return in;
+	}
+
+
+	void writeToFile(fstream& f)
+	{
+		int lg = strlen(this->denumire) + 1;
+		f.write((char*)&lg, sizeof(int));
+		f.write(this->denumire, lg);
+		int size = this->cantitate.size();
+		f.write((char*)&size, sizeof(int));
+
+		vector < int>::const_iterator  iS;
+		for (iS = this->cantitate.begin(); iS != this->cantitate.end(); iS++)
+		{
+			int valoare = *iS;
+			f.write((char*)&valoare, sizeof(int));
+		}
+	}
+
+	void readFromFile(fstream& f)
+	{
+		int lg;
+		f.read((char*)&lg, sizeof(int));
+		char* buffer = new char[lg];
+		f.read(buffer, lg);
+		setdenumire(buffer);
+		delete[] buffer;
+
+		int size;
+		f.read((char*)&size, sizeof(int));
+		this->cantitate.clear();
+		for (int i = 0; i < size; i++)
+		{
+			int val;
+			f.read((char*)&val, sizeof(int));
+			this->cantitate.push_back(val);
+		}
+	}
+
+
+	void scade(const vector<int>& cantitateScazuta)
+	{
+		if (cantitateScazuta.size() > 0)
+		{
+			for (int i = 0; i < cantitateScazuta.size(); i++)
+			{
+				if (i < cantitateScazuta.size())
+				{
+					this->cantitate[i] -= cantitateScazuta[i];
+					if (this->cantitate[i] < 0)
+						this->cantitate[i] = 0;
+				}
+			}
+		}
+		else
+			throw exception("cantitati invalide");
+	}
+};
+class Preparat
+{
+	string nume = "necunoscut";
+	int numarIngrediente = 0;
+	list<StocIngrediente>stoculIngredientelor;
+
+public:
+	Preparat()
+	{
+		this->nume = "necunoscut";
+		this->numarIngrediente = 0;
+	}
+
+	Preparat(const string& nume, int numarIngrediente, const list<StocIngrediente>& stoculIngredientelor)
+	{
+		if (nume != " " && nume.length() > 0)
+			this->nume = nume;
+		else
+			this->nume = "necunoscut";
+		if (numarIngrediente > 0)
+			this->numarIngrediente = numarIngrediente;
+		else
+			this->numarIngrediente = 0;
+		if (!stoculIngredientelor.empty())
+		{
+			this->stoculIngredientelor = stoculIngredientelor;
+		}
+		else
+			this->stoculIngredientelor.clear();
+	}
+	Preparat(const Preparat& p)
+	{
+		if (p.nume != " " && p.nume.length() > 0)
+			this->nume = p.nume;
+		else
+			this->nume = "necunoscut";
+		if (p.numarIngrediente > 0)
+			this->numarIngrediente = p.numarIngrediente;
+		else
+			this->numarIngrediente = 0;
+
+		if (!p.stoculIngredientelor.empty())
+		{
+			this->stoculIngredientelor = p.stoculIngredientelor;
+		}
+		else
+			this->stoculIngredientelor.clear();
+	}
+	~Preparat()
+	{
+		stoculIngredientelor.clear();
+	}
+
+	Preparat operator=(const Preparat& p)
+	{
+		if (this != &p)
+		{
+			stoculIngredientelor.clear();
+
+			if (p.nume != " " && p.nume.length() > 0)
+				this->nume = p.nume;
+			else
+				this->nume = "necunoscut";
+
+			if (p.numarIngrediente > 0)
+				this->numarIngrediente = p.numarIngrediente;
+			else
+				this->numarIngrediente = 0;
+
+			if (!p.stoculIngredientelor.empty())
+			{
+				this->stoculIngredientelor = p.stoculIngredientelor;
+			}
+			else
+				this->stoculIngredientelor.clear();
+		}
+		return *this;
+	}
+
+	friend ostream& operator<<(ostream& out, const Preparat& p)
+	{
+
+		if (p.nume != " " && p.nume.length() > 0)
+			out << "\n" << p.nume;
+
+		if (p.numarIngrediente > 0)
+			out << "\n" << p.numarIngrediente;
+
+		list<StocIngrediente>::const_iterator iI;
+		for (iI = p.stoculIngredientelor.begin(); iI != p.stoculIngredientelor.end(); iI++)
+		{
+			out << "\n" << *iI;
+		}
+		return out;
+	}
+
+	friend ofstream& operator<<(ofstream& out, const Preparat& p)
+	{
+		out << "\n----------------------------";
+		if (p.nume != " " && p.nume.length() > 0)
+			out << "\n Numele preparatului :" << p.nume;
+		else
+			out << "\n Numele preparatului=-";
+		if (p.numarIngrediente > 0)
+			out << "\n Numarul de ingrediente=" << p.numarIngrediente;
+		else
+			out << "\n Numarul de ingrediente=-";
+
+		if (!p.stoculIngredientelor.empty())
+		{
+			out << "\n Stocul de ingrediente:";
+			list<StocIngrediente>::const_iterator iI;
+			for (iI = p.stoculIngredientelor.begin(); iI != p.stoculIngredientelor.end(); iI++)
+			{
+				out << "\n" << *iI;
+			}
+		}
+		else
+			out << "\nniciun ingredient in stoc";
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Preparat& p)
+	{
+
+		getline(in, p.nume);
+		if (p.nume == " ")
+			p.nume = "necunoscut";
+
+		in >> p.numarIngrediente;
+
+		p.stoculIngredientelor.clear();
+
+		for (int i = 0; i < p.stoculIngredientelor.size(); i++)
+		{
+			StocIngrediente ingredient;
+			in >> ingredient;
+			p.stoculIngredientelor.push_back(ingredient);
+		}
+
+		return in;
+	}
+
+	friend ifstream& operator>>(ifstream& in, Preparat& p)
+	{
+		in.ignore();
+		in >> p.nume;
+		if (p.nume == " ")
+			p.nume = "necunoscut";
+
+		in >> p.numarIngrediente;
+
+		p.stoculIngredientelor.clear();
+
+		for (int i = 0; i < p.numarIngrediente; i++)
+		{
+			StocIngrediente ingredient;
+			in >> ingredient;
+			p.stoculIngredientelor.push_back(ingredient);
+		}
+
+		return in;
+	}
+
+	void writeToFile(fstream& f)
+	{
+		int lg = this->nume.size() + 1;
+		f.write((char*)&lg, sizeof(int));
+		f.write(this->nume.data(), lg);
+		f.write((char*)&this->numarIngrediente, sizeof(int));
+		int size = this->stoculIngredientelor.size();
+		f.write((char*)&size, sizeof(int));
+		list<StocIngrediente>::iterator iS;
+		for (iS = this->stoculIngredientelor.begin(); iS != this->stoculIngredientelor.end(); iS++)
+		{
+			iS->writeToFile(f);
+		}
+	}
+
+	void readFromFile(fstream& f)
+	{
+		int lg;
+		f.read((char*)&lg, sizeof(int));
+		if (lg <= 0 || lg > 1000)
+			return;
+
+		char* buffer = new char[lg];
+		f.read(buffer, lg);
+		this->nume = string(buffer);
+		delete[] buffer;
+
+		f.read((char*)&this->numarIngrediente, sizeof(int));
+
+		int size;
+		f.read((char*)&size, sizeof(int));
+
+
+		this->stoculIngredientelor.clear();
+		for (int i = 0; i < size; ++i)
+		{
+			StocIngrediente temp;
+			temp.readFromFile(f);
+			this->stoculIngredientelor.push_back(temp);
+		}
+	}
+
+
+	string getnume()
+	{
+		return this->nume;
+	}
+
+	void setnume(string numeNou)
+	{
+		if (sizeof(numeNou) >= 5)
+			this->nume = numeNou;
+	}
+
+	int getnumarIngrediente()
+	{
+		return this->numarIngrediente;
+	}
+
+	void setnumarIgrediete(int numarnou)
+	{
+		if (numarnou > 0)
+			this->numarIngrediente = numarnou;
+	}
+
+	list<StocIngrediente>& getstoculIngredientelor()
+	{
+		return this->stoculIngredientelor;
+	}
+
+	void setstoculIngredientelor(list<StocIngrediente>& stocNou)
+	{
+		if (!stocNou.empty())
+		{
+			this->stoculIngredientelor = stocNou;
+		}
+		else
+			throw exception("\n eroare accesare");
+	}
+
+	//operator!=
+	bool operator!=(const Preparat& p)
+	{
+		if (this->nume != p.nume)
+			return true;
+		if (this->numarIngrediente != p.numarIngrediente)
+			return true;
+		return false;
+	}
+};
+class Meniu
+{
+	int cantitate = 0;
+	map<string, Preparat>preparateDetaliate;
+
+public:
+	Meniu()
+	{
+		this->cantitate = 0;
+	}
+
+	Meniu(int cantitate, map<string, Preparat>& preparateDetaliate)
+	{
+		if (cantitate > 0)
+			this->cantitate = cantitate;
+		else
+			this->cantitate = 0;
+
+		if (!preparateDetaliate.empty())
+		{
+			this->preparateDetaliate = preparateDetaliate;
+		}
+		else
+			this->preparateDetaliate.clear();
+	}
+
+	Meniu(const Meniu& m)
+	{
+		if (m.cantitate > 0)
+			this->cantitate = m.cantitate;
+		else
+			this->cantitate = 0;
+		if (!m.preparateDetaliate.empty())
+		{
+			this->preparateDetaliate = m.preparateDetaliate;
+		}
+		else
+			this->preparateDetaliate.clear();
+	}
+
+	~Meniu()
+	{
+		preparateDetaliate.clear();
+	}
+
+	Meniu& operator=(const Meniu& m)
+	{
+		if (this != &m)
+		{
+			preparateDetaliate.clear();
+
+			if (m.cantitate > 0)
+				this->cantitate = m.cantitate;
+			else
+				this->cantitate = 0;
+
+			if (!m.preparateDetaliate.empty())
+			{
+				this->preparateDetaliate = m.preparateDetaliate;
+			}
+			else
+				this->preparateDetaliate.clear();
+		}
+		return *this;
+	}
+
+	explicit operator int()
+	{
+		return  this->cantitate;
+	}
+
+	int getcantitate()
+	{
+		return this->cantitate;
+
+	}
+
+	void setcantitate(int cantitate_noua)
+	{
+		if (cantitate_noua > 0)
+		{
+			this->cantitate = cantitate_noua;
+		}
+		else
+			throw exception("\n cantitate invalida");
+	}
+
+	const map<string, Preparat>& getpreparateDetaliate()
+	{
+		return this->preparateDetaliate;
+	}
+
+
+
+	void setpreparateDetaliate(const map<string, Preparat>& preparatNou)
+	{
+		this->preparateDetaliate = preparatNou;
+	}
+
+	const string getNumePreparat(int index) const
+	{
+		if (index >= 0 && index < preparateDetaliate.size())
+		{
+			int val = 0;
+			map<string, Preparat>::const_iterator  IM;
+			for (IM = preparateDetaliate.begin(); IM != preparateDetaliate.end(); IM++)
+			{
+				if (val == index)
+				{
+					return IM->first;
+				}
+			}
+		}
+		else
+			throw exception("\n Eroare");
+	}
+
+	void scadeStoc(int cantitateScazuta)
+	{
+		if (cantitateScazuta > 0)
+		{
+			cantitate -= cantitateScazuta;
+		}
+		if (cantitate < 0)
+			cantitate = 0;
+	}
+
+	friend ostream& operator<<(ostream& out, const Meniu& m)
+	{
+		out << "\n---------------------------------------";
+		if (m.cantitate > 0)
+			out << "\n cantitatea produselor:" << m.cantitate;
+		else
+			out << "\n cantitatea produselor=-";
+
+		if (!m.preparateDetaliate.empty() && m.preparateDetaliate.size() > 0)
+		{
+			out << "\n Nr de preparate este=" << m.preparateDetaliate.size();
+			out << "\n PREPARATE:";
+			map<string, Preparat>::const_iterator im;
+			for (im = m.preparateDetaliate.begin(); im != m.preparateDetaliate.end(); im++)
+			{
+				out << "\nNumele preparatului este=" << im->first;
+				out << "\n Preparatele detaliate:" << im->second;
+			}
+		}
+		else
+		{
+			out << "\nNumar de preparate=-";
+		}
+		return out;
+	}
+
+
+	friend ofstream& operator<<(ofstream& out, const Meniu& m)
+	{
+		out << "\n---------------------------------------";
+		if (m.cantitate > 0)
+			out << "\n cantitatea produselor:" << m.cantitate;
+		else
+			out << "\n cantitatea produselor=-";
+
+		if (!m.preparateDetaliate.empty() && m.preparateDetaliate.size() > 0)
+		{
+			out << "\n Nr de preparate este=" << m.preparateDetaliate.size();
+			out << "\n PREPARATE:";
+			map<string, Preparat>::const_iterator im;
+			for (im = m.preparateDetaliate.begin(); im != m.preparateDetaliate.end(); im++)
+			{
+				out << "\nNumele preparatului este=" << im->first;
+				out << "\n Preparatele detaliate:" << im->second;
+			}
+		}
+		else
+		{
+			out << "\nNumar de preparate=-";
+		}
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Meniu& m)
+	{
+		in >> m.cantitate;
+		if (m.cantitate < 0)
+			m.cantitate = 0;
+
+		int nrPreparate;
+		in >> nrPreparate;
+		if (nrPreparate < 0)
+		{
+			nrPreparate = 0;
+			m.preparateDetaliate.clear();
+		}
+		else
+		{
+			m.preparateDetaliate.clear();
+			for (int i = 0; i < nrPreparate; i++)
+			{
+
+				string nume;
+				in >> nume;
+				Preparat PreparateD;
+
+				in >> PreparateD;
+
+				m.preparateDetaliate[nume] = PreparateD;
+			}
+		}
+
+		return in;
+	}
+
+	friend ifstream& operator>>(ifstream& in, Meniu& m)
+	{
+		in >> m.cantitate;
+
+		int nrPreparate;
+		in >> nrPreparate;
+
+		m.preparateDetaliate.clear();
+		for (int i = 0; i < nrPreparate; i++)
+		{
+
+			string nume;
+			in >> nume;
+			Preparat PreparateD;
+
+			in >> PreparateD;
+
+			m.preparateDetaliate[nume] = PreparateD;
+		}
+
+		return in;
+	}
+
+	void writeToFile(fstream& f)
+	{
+		f.write((char*)&this->cantitate, sizeof(int));
+		int size = this->preparateDetaliate.size();
+		f.write((char*)&size, sizeof(int));
+
+		map<string, Preparat>::iterator  iM;
+		for (iM = preparateDetaliate.begin(); iM != this->preparateDetaliate.end(); iM++)
+		{
+			int valoare = iM->first.size();
+			f.write((char*)&valoare, sizeof(int));
+			f.write(iM->first.data(), valoare);
+
+			iM->second.writeToFile(f);
+		}
+	}
+
+	void readFromFile(fstream& f)
+	{
+		f.read((char*)&this->cantitate, sizeof(int));
+
+		int size;
+		f.read((char*)&size, sizeof(int));
+		this->preparateDetaliate.clear();
+
+
+		for (int i = 0; i < size; i++)
+		{
+			int lungimeN;
+			f.read((char*)&lungimeN, sizeof(int));
+			vector<char> buffer(lungimeN);
+			f.read(buffer.data(), lungimeN);
+
+			string numePreparat(buffer.begin(), buffer.end());
+
+			Preparat preparat;
+			preparat.readFromFile(f);
+			this->preparateDetaliate[numePreparat] = preparat;
+
+		}
+	}
+
+	Meniu  operator+(int CantitateSuplimentara)
+	{
+		if (cantitate > 0)
+		{
+			Meniu temp = *this;
+			temp.cantitate += CantitateSuplimentara;
+			return temp;
+		}
+		else
+			throw exception("\n Eroare");
+	}
+};
+class Comenzi :public IPlatibil
+{
+	const int id = 0;
+	set<string>nume_preparat;
+	int nrComenzi = 0;
+	Meniu meniu;
+	StocIngrediente ingrediente;
+public:
+	Comenzi(int id) :id(id), meniu(), ingrediente()
+	{
+		this->nrComenzi = 0;
+		this->meniu;
+	}
+
+	Comenzi(int id, set<string>& nume_preparat, int nrComenzi) :id(id), meniu(), ingrediente()
+	{
+		if (!this->nume_preparat.empty())
+		{
+			this->nume_preparat = nume_preparat;
+		}
+		else
+			this->nume_preparat.clear();
+		if (nrComenzi > 0)
+			this->nrComenzi = nrComenzi;
+		else
+			this->nrComenzi = 0;
+	}
+
+	Comenzi(const Comenzi& c) :id(c.id), meniu(), ingrediente()
+	{
+		if (!c.nume_preparat.empty())
+		{
+			this->nume_preparat = c.nume_preparat;
+		}
+		else
+			this->nume_preparat.clear();
+		if (c.nrComenzi > 0)
+			this->nrComenzi = c.nrComenzi;
+		else
+			this->nrComenzi = 0;
+	}
+
+	Comenzi& operator=(const Comenzi& c)
+	{
+		if (this != &c)
+		{
+			nume_preparat.clear();
+			if (!c.nume_preparat.empty())
+			{
+				this->nume_preparat = c.nume_preparat;
+			}
+			else
+				this->nume_preparat.clear();
+			if (c.nrComenzi > 0)
+				this->nrComenzi = c.nrComenzi;
+			else
+				this->nrComenzi = 0;
+
+		}
+		return *this;
+	}
+
+	string getNumepreparat(int index)
+	{
+		if (index >= 0 && index < nume_preparat.size())
+		{
+			set<string>::iterator it = nume_preparat.begin();
+			for (int i = 0; i < index; ++i)
+				++it;
+			return *it;
+		}
+
+		else
+			throw exception("\n ****");
+	}
+
+
+	set<string >& getnume_preparat()
+	{
+		return this->nume_preparat;
+	}
+
+
+	void setnume_preparat(set<string>& numeNou)
+	{
+		if (!nume_preparat.empty())
+			nume_preparat.clear();
+
+		else
+		{
+			if (!numeNou.empty() && numeNou.size() > 0)
+				nume_preparat = numeNou;
+			else
+				throw exception("\n numar de preparate invalid");
+
+		}
+	}
+
+	int getnrComenzi()
+	{
+		return this->nrComenzi;
+	}
+
+	void setnrComenzi(int nrComenzinoi)
+	{
+		if (nrComenzinoi > 0)
+			this->nrComenzi = nrComenzinoi;
+	}
+
+	// pre-incrementare  -- operator--
+	Comenzi& operator--()
+	{
+		nrComenzi--;
+		return *this;
+	}
+
+	//pre-incrementare  -- operator++
+	Comenzi& operator++()
+	{
+		nrComenzi++;
+		return *this;
+	}
+
+	
+
+	bool verifica_stoc(Meniu& meniu, StocIngrediente& ingrediente, int index)
+	{
+		if (index >= 0 && index < meniu.getpreparateDetaliate().size())
+		{
+			vector<int> cantitateDisp = ingrediente.getcantitate(index);
+			if (cantitateDisp.size() > 0)
+			{
+				cout << "\n Avem stoc disponibil pentru= ";
+				return true;
+			}
+			else
+				cout << "\n Stoc epuizat pentru =" << meniu.getNumePreparat(index);
+			return false;
+		}
+		else
+		{
+			cout << "\n Index invalid";
+			return false;
+		}
+	}
+
+
+	~Comenzi()
+	{
+		nume_preparat.clear();
+	}
+
+	friend ostream& operator<<(ostream& out, const Comenzi& c)
+	{
+
+		out << "\n ID ul comenzi este=" << c.id;
+		if (c.nrComenzi > 0)
+			out << "\n Numarul de comenzi=" << c.nrComenzi;
+		else
+			out << "\n numarul de comenzi=-";
+		if (!c.nume_preparat.empty() && c.nume_preparat.size() > 0)
+		{
+			out << "\nNumele preparatului=";
+			set<string>::iterator is;
+			for (is = c.nume_preparat.begin(); is != c.nume_preparat.end(); is++)
+				out << *is << " ";
+		}
+		else
+			out << "\nnu exista preparate";
+		return out;
+	}
+
+	friend ofstream& operator<<(ofstream& out, const Comenzi& c)
+	{
+
+		out << "\n" << c.id;
+		if (c.nrComenzi > 0)
+			out << "\n" << c.nrComenzi;
+
+		if (!c.nume_preparat.empty() && c.nume_preparat.size() > 0)
+		{
+
+			set<string>::iterator is;
+			for (is = c.nume_preparat.begin(); is != c.nume_preparat.end(); is++)
+				out << "\n" << *is << " ";
+		}
+
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Comenzi& c)
+	{
+		cout << "\n Numarul de comenzi:";
+		in >> c.nrComenzi;
+		if (c.nrComenzi < 0)
+			c.nrComenzi = 0;
+
+		cout << "\n Numarul de preparate: ";
+		int numPreparate;
+		in >> numPreparate;
+
+		c.nume_preparat.clear();
+
+		if (numPreparate > 0)
+		{
+			string nume;
+			cout << "\n Introduceti numele preparatelor:\n";
+			in.ignore();
+			for (int i = 0; i < numPreparate; ++i)
+			{
+				getline(in, nume);
+				c.nume_preparat.insert(nume);
+			}
+		}
+		return in;
+	}
+
+	friend ifstream& operator>>(ifstream& in, Comenzi& c)
+	{
+		c.nume_preparat.clear();
+		string line;
+		int numar;
+		getline(in, line);
+
+		in >> c.nrComenzi;
+		if (c.nrComenzi < 0)
+			c.nrComenzi = 0;
+
+		in >> numar;
+		if (numar < 0)
+			numar = 0;
+
+		else
+		{
+			for (int i = 0; i < numar; i++)
+			{
+				string nume;
+				in >> nume;
+				c.nume_preparat.insert(nume);
+			}
+		}
+		return in;
+	}
+
+	void writeToFile(fstream& f)
+	{
+		f.write((char*)&this->id, sizeof(int));
+		f.write((char*)&this->nrComenzi, sizeof(int));
+
+		int lung = this->nume_preparat.size();
+		f.write((char*)&lung, sizeof(int));
+
+		set<string>::const_iterator is;
+		for (is = this->nume_preparat.begin(); is != this->nume_preparat.end(); is++)
+		{
+			const string nume = *is;
+			int lg = nume.size();
+			f.write((char*)&lg, sizeof(int));
+			f.write(nume.data(), lg);
+		}
+	}
+
+	 void readFromFile(fstream& f)
+	{
+		f.read((char*)&this->id, sizeof(int));
+		f.read((char*)&this->nrComenzi, sizeof(int));
+
+		int lung;
+		f.read((char*)&lung, sizeof(int));
+		this->nume_preparat.clear();
+		for (int i = 0; i < lung; i++)
+		{
+			int lg;
+			f.read((char*)&lg, sizeof(int));
+			char* buffer = new char[lg + 1];
+			f.read(buffer, lg);
+			buffer[lg] = '\0';
+			this->nume_preparat.insert(string(buffer));
+			delete[] buffer;
+		}
+	}
+};
+class ExceptieImput
+{
+	string mesaj;
+public:
+	ExceptieImput(string mesaj) :mesaj(mesaj) {}
+
+	string getMesaj()
+	{
+		return this->mesaj;
+	}
+};
+class Restaurant
+{
+	string nume_rest = "necunoscut";
+	vector<int >mese;
+	static int  anDeschidere;
+	StocIngrediente ingrediente;
+	Meniu meniu;
+
+public:
+
+	Restaurant()
+	{
+		this->nume_rest = "necunoscut";
+		this->anDeschidere;
+		this->ingrediente;
+		this->meniu;
+	}
+	Restaurant(string nume_rest, vector<int>& mese) :ingrediente(), meniu()
+	{
+		if (nume_rest != " " && nume_rest.length() > 0)
+			this->nume_rest = nume_rest;
+		else
+			this->nume_rest = "necunoscut";
+
+		if (!mese.empty() && mese.size() > 0)
+		{
+			this->mese = mese;
+		}
+		else
+			mese.clear();
+	}
+
+	Restaurant(const Restaurant& r) :ingrediente(), meniu()
+	{
+		if (r.nume_rest != " " && r.nume_rest.length() > 0)
+			this->nume_rest = r.nume_rest;
+		else
+			this->nume_rest = "necunoscut";
+
+		if (!r.mese.empty() && r.mese.size() > 0)
+		{
+			this->mese = r.mese;
+		}
+		else
+			mese.clear();
+	}
+
+	static int getanDeschidere()
+	{
+		return anDeschidere;
+	}
+
+	void setanDeschidere(int anDeschidere)
+	{
+		if (anDeschidere > 2020)
+			Restaurant::anDeschidere = anDeschidere;
+	}
+
+	string getnume_rest()
+	{
+		return this->nume_rest;
+	}
+
+	void setnume_rest(string numenou)
+	{
+		if (numenou.length() >= 3 && numenou.length() <= 30)
+		{
+			nume_rest = numenou;
+		}
+		else
+		{
+			throw exception("/n Numele va ramane cel initial,numele sugerat nu respecta conditiile!");
+		}
+	}
+
+	//operator[]
+	int operator[](int index)
+	{
+		if (index >= 1 && index < this->mese.size())
+		{
+			if (!mese.empty()) {
+				return this->mese[index];
+			}
+		}
+		return -1;
+	}
+
+	~Restaurant()
+	{
+		mese.clear();
+	}
+
+	Restaurant& operator=(const Restaurant& r)
+	{
+		if (this != &r)
+		{
+			mese.clear();
+
+			if (r.nume_rest != " " && r.nume_rest.length() > 0)
+				this->nume_rest = r.nume_rest;
+			else
+				this->nume_rest = "necunoscut";
+
+			if (!r.mese.empty() && r.mese.size() > 0)
+			{
+				this->mese = r.mese;
+			}
+			else
+				mese.clear();
+		}
+		return *this;
+	}
+
+
+
+	friend ostream& operator<<(ostream& out, const Restaurant& r)
+	{
+		out << "\n--------------------------------------";
+		if (r.nume_rest != " ")
+			out << "\n Numele restaurantului:" << r.nume_rest;
+		else
+			out << "\n nume restuarant=-";
+
+		out << "\nAnul deschiderii restaurantului:" << r.anDeschidere;
+
+		out << "\n Numarul de mese=" << r.mese.size();
+		out << "\n Numarul de scaunde de la fiecare masa=";
+		vector<int>::const_iterator it;
+		for (it = r.mese.begin(); it != r.mese.end(); it++)
+		{
+			out << *it << " ";
+		}
+
+		return out;
+	}
+
+
+	friend ofstream& operator<<(ofstream& out, const Restaurant& r)
+	{
+		//out << "\n--------------------------------------";
+		if (r.nume_rest != " ")
+			out << "\n " << r.nume_rest;
+		else
+			out << "\n nume restuarant=-";
+
+		out << "\n" << r.anDeschidere;
+
+		out << "\n" << r.mese.size();
+		out << "\n ";
+		vector<int>::const_iterator it;
+		if (!r.mese.empty())
+		{
+			for (it = r.mese.begin(); it != r.mese.end(); it++)
+			{
+				out << *it << " ";
+			}
+		}
+		return out;
+	}
+	friend istream& operator>>(istream& in, Restaurant& r)
+	{
+		in.ignore();
+		getline(in, r.nume_rest);
+		if (r.nume_rest == " ")
+			r.nume_rest = "necunoscut";
+
+		in >> r.anDeschidere;
+
+		int numarMese = r.mese.size();
+		in >> numarMese;
+		r.mese.clear();
+
+		for (int i = 0; i < numarMese; i++)
+		{
+			int  masa;
+			in >> masa;
+			r.mese.push_back(masa);
+		}
+		return in;
+	}
+
+
+	friend ifstream& operator>>(ifstream& in, Restaurant& r)
+	{
+		in.ignore();
+		getline(in, r.nume_rest);
+		if (r.nume_rest == " ")
+			r.nume_rest = "necunoscut";
+
+		in >> r.anDeschidere;
+
+		int numarMese = r.mese.size();
+		in >> numarMese;
+		r.mese.clear();
+
+		for (int i = 0; i < numarMese; i++)
+		{
+			int  masa;
+			in >> masa;
+			r.mese.push_back(masa);
+		}
+		return in;
+	}
+
+
+
+	void writeToFile(fstream& f)
+	{
+		int lg = this->nume_rest.size() + 1;
+		f.write((char*)&lg, sizeof(int));
+		f.write(this->nume_rest.data(), lg);
+
+		f.write((char*)&this->anDeschidere, sizeof(int));
+
+		int size = this->mese.size();
+		f.write((char*)&size, sizeof(int));
+
+		vector<int>::const_iterator it;
+		for (it = this->mese.begin(); it != this->mese.end(); it++)
+		{
+			int valoare = *it;
+			f.write((char*)&valoare, sizeof(int));
+		}
+	}
+
+	void readFromFile(fstream& f)
+	{
+		int lg;
+		f.read((char*)&lg, sizeof(int));
+		char* buffer = new char[lg];
+		f.read(buffer, lg);
+		setnume_rest(buffer);
+		delete[] buffer;
+
+		f.read((char*)&this->anDeschidere, sizeof(int));
+
+		int size;
+		f.read((char*)&size, sizeof(int));
+		this->mese.clear();
+		for (int i = 0; i < size; i++)
+		{
+			int valoare;
+			f.read((char*)&valoare, sizeof(int));
+			this->mese.push_back(valoare);
+		}
+	}
+
+	//post_incremenatare
+	Restaurant operator++(int)
+	{
+		Restaurant temp = *this;
+		if (this->mese.size() > 0 && !mese.empty())
+		{
+			for (int i = 0; i < this->mese.size(); i++)
+			{
+				if (this->mese[i] > 0)
+					this->mese[i]--;
+				else
+					this->mese[i]++;
+			}
+		}
+		return temp;
+	}
+
+	//operatorul cast
+	explicit operator int()
+	{
+		if (this->mese.size() == 0 && mese.empty())
+			return 0;
+		else
+		{
+			int total = 0;
+			for (int i = 0; i < this->mese.size(); i++)
+				total += this->mese[i];
+			return total;
+		}
+	}
+};
+class Raport
+{
+public:
+	void RUtilizatori(const vector<string>& utilizatori, const string& numefisier)
+	{
+
+		if (utilizatori.empty())
+		{
+			cout << "nu exista utilizatori" << endl;
+			return;
+		}
+		//afisare la consola
+		vector<string>::const_iterator iv;
+		for (iv = utilizatori.begin(); iv != utilizatori.end(); iv++)
+		{
+			cout << *iv << " ";
+		}
+
+		//scriere in fisier
+		ofstream f(numefisier);
+		for (iv = utilizatori.begin(); iv != utilizatori.end(); iv++)
+		{
+			f << *iv << " ";
+		}
+		f.close();
+	}
+
+	void RIntrebari(const vector<string>intrebari, const string& numefisier)
+	{
+		vector<string>::const_iterator ii;
+
+		for (ii = intrebari.begin(); ii != intrebari.end(); ii++)
+		{
+			cout << *ii << " ";
+		}
+
+		ofstream f(numefisier);
+		for (ii = intrebari.begin(); ii != intrebari.end(); ii++)
+		{
+			f << *ii << " ";
+		}
+		f.close();
+	}
+
+	void RRaspunsuri(const vector<string>raspunsuri, const string& numefisier)
+	{
+		ofstream f(numefisier);
+		vector<string>::const_iterator ir;
+		for (ir = raspunsuri.begin(); ir != raspunsuri.end(); ir++)
+		{
+			cout << *ir << " ";  //afisare consola
+			f << *ir << " ";  //afisare in fisier txt
+		}
+		f.close();
+	}
+};
+
+int Restaurant::anDeschidere = 2020;
+
+int main()
+{
+	vector<int>cantitate1 = { 1000,5000,4000,5000,2000,6000 };
+	const char* denumire{ "ciuperci,masline,sos,salam,cascaval,ardei" };
+	StocIngrediente stocIngredient1(denumire, cantitate1);
+
+	//scriere in fisier
+	ofstream f("stocIngredient1.txt");
+	f << stocIngredient1;
+	f.close();
+
+	//scriere in fisier binar
+	fstream fileI1("STOCingrediente1.bin", ios::out | ios::binary);
+	stocIngredient1.writeToFile(fileI1);
+	fileI1.close();
+
+
+	vector<int>cantitate2 = { 500,2000,3000,2000 };
+	const char* denumire2{ "faina,sare,paste,sos" };
+	StocIngrediente stocIngredient2(denumire2, cantitate2);
+
+	ofstream Stoc2("stocIngredient2.txt");
+	Stoc2 << stocIngredient2;
+	Stoc2.close();
+
+	fstream fileI2("STOCingrediente2.bin", ios::out | ios::binary);
+	stocIngredient2.writeToFile(fileI2);
+	fileI2.close();
+
+	vector<int>cantitate3 = { 2000,5000,2000,1500,1000 };
+	const char* denumire3{ "ardei,ceapa,masline,rosii,ciuperci" };
+	StocIngrediente stocIngredient3(denumire3, cantitate3);
+
+	ofstream Stoc3("stocIngredient3.txt");
+	Stoc3 << stocIngredient3;
+	Stoc3.close();
+
+	fstream fileI3("STOCingrediente3.bin", ios::out | ios::binary);
+	stocIngredient3.writeToFile(fileI3);
+	fileI3.close();
+
+
+	list<StocIngrediente>stoc1 = { stocIngredient1 };
+	list<StocIngrediente>stoc2 = { stocIngredient2 };
+	list<StocIngrediente>stoc3 = { stocIngredient3 };
+	Preparat p1("pizza", 6, stoc1);
+	Preparat p2("pasta", 4, stoc2);
+	Preparat p3("burgger", 6, stoc1);
+	Preparat p4("salata", 5, stoc3);
+	Preparat p5("pizza vegetariana ", 5, stoc3);
+
+	//scriere in fisier text
+	ofstream fp("preparat.txt");
+	fp << p1;
+	fp << p2;
+	fp << p3;
+	fp << p4;
+	fp << p5;
+	fp.close();
+
+	//scriere in fisier binar
+	fstream fpb("preparat.bin", ios::out | ios::binary);
+	p1.writeToFile(fpb);
+	p2.writeToFile(fpb);
+	p3.writeToFile(fpb);
+	p4.writeToFile(fpb);
+	p5.writeToFile(fpb);
+	fpb.close();
+
+
+	map<string, Preparat>	Preparate;
+	Preparate["pizza"] = p1;
+	Preparate["pasta"] = p2;
+	Preparate["burgger"] = p3;
+	Preparate["salata"] = p4;
+	Preparate["pizza vegetariana"] = p5;
+	Meniu meniu(250, Preparate);
+
+	//scriere in fisier text
+	ofstream fm("meniu.txt");
+	fm << meniu;
+	fm.close();
+
+	//scriere in fisier binar
+	fstream fmb("meniu.bin", ios::out | ios::binary);
+	meniu.writeToFile(fmb);
+	fmb.close();
+
+
+	vector<int> mese = { 4,5,6,7,2 };
+	Restaurant restaurant("Restaurant VENIZ ", mese);
+
+	//scriere in fisier text
+	ofstream fr("restaurant.txt");
+	fr << restaurant;
+	fr.close();
+
+	//citire din fisiere text
+	ifstream fr1("restaurant.txt");
+	Restaurant r1;
+	fr1 >> r1;
+	fr1.close();
+	cout << endl;
+	cout << "\nInformatii din fisier rest :" << r1;
+
+	//scriere in fisier binar
+	fstream fbw("resturant.bin", ios::out | ios::binary);
+	restaurant.writeToFile(fbw);
+	fbw.close();
+
+	cout << "\n Bine ati venit la " << restaurant.getnume_rest() << "!\n";
+
+
+	while (true)
+	{
+		cout << "\nScrieti comanda (legenda-->pentru lista de comenzi) ";
+		string comanda;
+		cin >> comanda;
+
+		if (comanda == "legenda")
+		{
+			cout << "\n ----------------LISTA DE COMENZI-------------------------";
+			cout << "\n 1.afisareStoc --Afisare stocul de ingrediente";
+			cout << "\n 2.meniu--Afisare meniu";
+			cout << "\n 3.afisarePreparate--Afisare lista de preparate detaliat ";
+			cout << "\n 4.adauga_comanda--Adauga o coamnda noua";
+			cout << "\n 5.locuri_disponibile->Locuri disponibile in restaurant";
+			cout << "\n 6.raportUtilizatori";
+			cout << "\n 7.raportIntrebari";
+			cout << "\n 8.raportRaspunsuri";
+			cout << "\n 9.iesire--Iesire din lista de comenzi";
+		}
+		else
+			if (comanda == "afisareStoc")
+			{
+				cout << "\n Stocul initial al ingredientelor";
+				ifstream g1("stocIngredient1.txt");
+				StocIngrediente ingredieneteFisier1;
+				g1 >> ingredieneteFisier1;
+				g1.close();
+				cout << endl;
+				cout << "\nInformatii din fisier :" << ingredieneteFisier1;
+				cout << endl;
+
+				fstream rfile1("STOCingrediente1.bin", ios::in | ios::binary);
+				StocIngrediente stoccc1;
+				stoccc1.readFromFile(rfile1);
+				rfile1.close();
+				cout << "\nInformatii din fisier binar=" << stoccc1;
+
+				ifstream g2("stocIngredient2.txt");
+				StocIngrediente ingredieneteFisier2;
+				g2 >> ingredieneteFisier2;
+				g2.close();
+				cout << endl;
+				cout << "\nInformatii din fisier :" << ingredieneteFisier2;
+				cout << endl;
+
+				fstream rfile2("STOCingrediente2.bin", ios::in | ios::binary);
+				StocIngrediente stoccc2;
+				stoccc2.readFromFile(rfile2);
+				rfile2.close();
+				cout << "\nInformatii din fisier binar2=" << stoccc2;
+
+				ifstream g3("stocIngredient3.txt");
+				StocIngrediente ingredieneteFisier3;
+				g3 >> ingredieneteFisier3;
+				g3.close();
+				cout << endl;
+				cout << "\nInformatii din fisier :" << ingredieneteFisier3;
+				cout << endl;
+
+				fstream rfile3("STOCingrediente3.bin", ios::in | ios::binary);
+				StocIngrediente stoccc3;
+				stoccc3.readFromFile(rfile3);
+				rfile3.close();
+				cout << "\nInformatii din fisier binar 3=" << stoccc3;
+
+				cout << endl;
+
+				//operatorul>
+				if (stocIngredient1 > stocIngredient2)
+					cout << "\n Stocuri  de ingrediente 1 este mai mare decat 2 ";
+				else
+					cout << "\n Stocul de ingrediente 1 nu este mai mare decat 2";
+				//opertorul ==
+				if (stocIngredient1 == stocIngredient2)
+					cout << "\n stocul de ingrediente 1 este identic cu 2";
+				else
+					cout << "\n stocul de ingrediente 1 este diferite fata de stocul  2";
+
+			}
+			else
+				if (comanda == "afisarePreparate")
+				{
+					//opertator<<
+					ifstream fpp("preparat.txt");
+					string line;
+					while (getline(fpp, line))
+					{
+						istringstream iss(line);
+						Preparat preparateFisier;
+						iss >> preparateFisier;
+						cout << preparateFisier;
+					}
+					fpp.close();
+					cout << endl;
+					//operatorul!=
+					if (p4 != p5)
+						cout << "\n Preparatele sunt diferite";
+					else
+						cout << "\n Preparatele sunt identice";
+				}
+				else
+					if (comanda == "meniu")
+					{
+						map<string, Preparat>	Preparate;
+						Preparate["pizza"] = p1;
+						Preparate["pasta"] = p2;
+						Preparate["burgger"] = p3;
+						Preparate["salata"] = p4;
+						Preparate["pizza vegetariana"] = p5;
+						Meniu meniu(250, Preparate);
+
+					
+						fstream fmm("meniu.bin", ios::in | ios::binary);
+						Meniu menuiuu;
+						menuiuu.readFromFile(fmm);
+						fmm.close();
+						cout << "\n informatii din fisier meniu =" << menuiuu;
+
+						//operator+
+						if (meniu.getcantitate() < 150)
+							meniu = meniu + 100;
+					}
+					else
+						if (comanda == "adauga_comanda")
+						{
+							Comenzi c1(1);
+							cin >> c1;
+							bool verificaE = false;
+							for (int i = 0; i < meniu.getpreparateDetaliate().size(); i++)
+							{
+								try {
+									string preparate = c1.getNumepreparat(i);
+									if (preparate == "pizza" || preparate == "pasta" || preparate == "salata" || preparate == "pizza" || preparate == "burgger" || preparate == "pizza vegetariana")
+									{
+										verificaE = true;
+										break;
+									}
+								}
+								catch (const exception& e)
+								{
+									cerr << e.what() << endl;
+								}
+							}
+
+							ofstream fc("comenzi.txt");
+							fc << c1;
+							fc.close();
+
+
+							fstream fcw("comenzi.bin", ios::out | ios::binary);
+							c1.writeToFile(fcw);
+							fcw.close();
+
+							cout << "\n Comanda a fost adaugata cu succes";
+							cout << "\n Numarul de comenzi este =" << c1.getnrComenzi();
+
+							ifstream fcom("comenzi.txt");
+							Comenzi  com(1);
+							fcom >> com;
+							fcom.close();
+							cout << "\n Informatii din fisier comenzi=" << com;
+
+							fstream fcr("comenzi.bin", ios::in | ios::binary);
+							Comenzi comenzi(1);
+							comenzi.readFromFile(fcr);
+							fcr.close();
+							cout << "\n informatii comenzi din fisier binar=" << comenzi;
+						}
+						else
+							if (comanda == "locuri_disponibile")
+							{
+								//opertor cast 
+								int total = (int)restaurant;
+								cout << "\n total de scaune=" << total;
+
+								//operatorul ++
+								bool dorinta;
+								cout << "\n Doriti sa mai adaugam un scaun la masa 0?  (0 = da, 1 = nu)";
+								cin >> dorinta;
+								if (dorinta == 0)
+								{
+
+									restaurant = restaurant++;
+									cout << "\n Numarul de scaune acum este=" << mese.size();
+								}
+
+								//operator[]
+								int index = 0;
+								cout << "\n Introduceti masa la care doriti sa va asezati ";
+								cin >> index;
+								int retine = restaurant[index];
+
+								if (retine != -1)
+
+									cout << "\n Numarul de scaunde de la masa dorita  este=" << retine;
+								else
+									cout << "\n index invalid ";
+							}
+							else
+								if (comanda == "raportUtilizatori")
+								{
+
+									Raport raport1;
+									vector<string> ziua = { "luni","marti","miercuri","joi","vineri","sambata","duminica" };
+									vector<string>::iterator iz;
+
+									for (iz = ziua.begin(); iz != ziua.end(); iz++)
+									{
+										cout << "\n Lista clienti de " << *iz << " = ";
+										vector<string>utilizatori1 = { "alina","mariana","radu","andrei" ,"irina" };
+										raport1.RUtilizatori(utilizatori1, "raportUtilizatori.txt");
+										
+									}
+								}
+								else
+									if (comanda == "raportIntrebari")
+									{
+										Raport  raport1;
+										Raport raport2;
+										Raport raport3;
+
+										cout << endl;
+
+										vector<string>intrebari1 = { {"\nCare este parola de la WI-FI?"},{"\nUnde este toaleta?"} ,{"\nSe poate achita si cu cardul?"},{"\nCare este ora de inchidere a restaurantului?"} };
+										vector<string>intrebari2 = { {"\nPutem comanda si online?"},{"\nSe poate comanda si la pachet?"} };
+										vector<string>intrebari3 = { {"\nExista obtiune pentru personalizarea preparatelor?"} , {"\nAveti si meniu pentru copii?"} };
+
+										cout << "\n**Intrebari despre restuarnt**=";  raport1.RIntrebari(intrebari1, "raportIntrebari_rest.txt");
+										cout << endl;
+										cout << "\n**Intrebari despre comenzi**="; raport2.RIntrebari(intrebari2, "raportIntrebari_comenzi.txt");
+										cout << endl;
+										cout << "\n**Intrebari despre meniu**="; raport3.RIntrebari(intrebari3, "raportIntrebari_meniu.txt");
+									}
+									else
+										if (comanda == "raportRaspunsuri")
+										{
+											Raport  raport1;
+											Raport raport2;
+											Raport raport3;
+
+											cout << endl;
+
+											vector<string>raspunsuri1 = { {"\nParola de la WI-FI este=78625RT"},{"\nToaleta se afla dupa zona de joaca a copiilor ,la stanga"},{"\nPlata se poate face si cu cardul"},{"\nOra de inchidere este 22:00"} };
+											vector<string>raspunsuri2 = { {"\nNu se pot face comenzi online inca"},{"\nSigur,comanda se poate pune si la pachet"} };
+											vector<string>raspunsuri3 = { {"\nNu,nu exista aceasta obtiune"},{"\nNu,nu avem meniu si pentru copii"} };
+
+
+											cout << "\n**Raspunsurile pentru intrebarile despre restaurant**="; raport1.RRaspunsuri(raspunsuri1, "raportRaspunsuri_rest.txt");
+											cout << endl;
+											cout << "\n**Raspunsurile pentru intrebarile despre comenzi**="; raport2.RRaspunsuri(raspunsuri2, "raportRaspunsuri_comenzi.txt");
+											cout << endl;
+											cout << "\n**Raspunsurile pentru intrebarile despre meniu**="; raport3.RRaspunsuri(raspunsuri3, "raportRaspunsuri_meniu.txt");
+										}
+										else
+											if (comanda == "iesire")
+											{
+												cout << "LA REVEDERE";
+												break;
+											}
+											else
+												cout << "\nComanda neidentificata.Tastati  legenda pentru a vedea obtiunile disponibile!";
+
+	}
+	return 0;
+}
