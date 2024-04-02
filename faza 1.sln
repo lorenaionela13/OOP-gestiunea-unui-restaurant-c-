@@ -1,31 +1,1855 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33502.453
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "faza 1", "faza 1.vcxproj", "{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Debug|x64.ActiveCfg = Debug|x64
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Debug|x64.Build.0 = Debug|x64
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Debug|x86.ActiveCfg = Debug|Win32
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Debug|x86.Build.0 = Debug|Win32
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Release|x64.ActiveCfg = Release|x64
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Release|x64.Build.0 = Release|x64
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Release|x86.ActiveCfg = Release|Win32
-		{BDB854CB-FBCD-40E7-8574-9D8A847F77F9}.Release|x86.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C75A3A5B-4FCB-43F9-9F74-04A8060ED0E6}
-	EndGlobalSection
-EndGlobal
+#define _CRT_SECURE_NO_WARNINGS
+#include<iostream>
+#include<string>
+using namespace std;
+
+class StocIngrediente
+{
+	char* denumire = nullptr;
+	int* cantitate = nullptr;
+	int size = 0;
+
+public:
+	StocIngrediente()
+	{
+		this->denumire = nullptr;
+		this->cantitate = nullptr;
+		this->size = 0;
+	}
+
+	StocIngrediente(int* cantitate, int size)
+	{
+
+
+		if (denumire != nullptr && strlen(denumire) > 0)
+		{
+			this->denumire = new char[strlen(denumire) + 1];
+			strcpy(this->denumire, denumire);
+			this->denumire[strlen(denumire)] = '\0';
+		}
+		else
+			this->denumire = nullptr;
+		if (size > 0 && cantitate != nullptr)
+		{
+			this->size = size;
+			this->cantitate = new int[this->size];
+			for (int i = 0; i < size; i++)
+				this->cantitate[i] = cantitate[i];
+		}
+		else
+		{
+			this->size = 0;
+			this->cantitate = nullptr;
+		}
+	}
+
+	StocIngrediente(const char* denumire, int* cantitate, int size)
+	{
+		if (denumire != nullptr && strlen(denumire) > 0)
+		{
+			this->denumire = new char[strlen(denumire) + 1];
+			strcpy(this->denumire, denumire);
+			this->denumire[strlen(denumire)] = '\0';
+		}
+		else
+			this->denumire = nullptr;
+
+		if (size > 0 && cantitate != nullptr)
+		{
+			this->size = size;
+			this->cantitate = new int[this->size];
+			for (int i = 0; i < size; i++)
+				this->cantitate[i] = cantitate[i];
+		}
+		else
+		{
+			this->size = 0;
+			this->cantitate = nullptr;
+		}
+
+	}
+
+
+	StocIngrediente(const StocIngrediente& i)
+	{
+		if (i.denumire != nullptr)
+		{
+			this->denumire = new char[strlen(i.denumire) + 1];
+			strcpy(this->denumire, i.denumire);
+			this->denumire[strlen(denumire)] = '\0';
+		}
+		else
+			this->denumire = nullptr;
+		if (i.size > 0 && i.cantitate != nullptr)
+		{
+			this->size = i.size;
+			this->cantitate = new int[i.size];
+			for (int j = 0; j < i.size; j++)
+				this->cantitate[j] = i.cantitate[j];
+		}
+		else
+		{
+			this->size = 0;
+			this->cantitate = nullptr;
+		}
+
+	}
+
+	~StocIngrediente()
+	{
+		delete[] this->denumire;
+		delete[] this->cantitate;
+	}
+
+	StocIngrediente& operator=(const StocIngrediente& i)
+	{
+		if (this != &i)
+		{
+			delete[] this->denumire;
+
+
+			if (i.size > 0 && i.cantitate != nullptr)
+			{
+				this->size = i.size;
+				this->cantitate = new int[i.size];
+				for (int j = 0; j < i.size; j++)
+					this->cantitate[j] = i.cantitate[j];
+			}
+			else
+			{
+				this->size = 0;
+				this->cantitate = nullptr;
+			}
+			if (i.denumire != nullptr)
+			{
+				this->denumire = new char[strlen(i.denumire) + 1];
+				strcpy(this->denumire, i.denumire);
+
+			}
+			else
+				this->denumire = nullptr;
+
+		}
+		return *this;
+	}
+
+	const char* getdenumire()
+	{
+		return this->denumire;
+	}
+
+	void setdenumire(const char* denumirenou)
+	{
+		if (denumirenou != nullptr && strlen(denumirenou) > 0)
+		{
+			this->denumire = new char[strlen(denumirenou) + 1];
+			strcpy(this->denumire, denumirenou);
+		}
+		else
+			throw exception("eroare");
+	}
+	int getsize()
+	{
+		return this->size;
+	}
+
+	void setsize(int sizeNou)
+	{
+		if (sizeNou > 0)
+			this->size = sizeNou;
+
+	}
+
+
+	int* getcantitate()
+	{
+		return this->cantitate;
+	}
+
+
+	int getCantitate(int index)
+	{
+		if (index >= 0 && index < size)
+			return this->cantitate[index];
+		else
+			throw exception("nu avem cantitate");
+	}
+
+	void setcantitate(int* cantitateNoua, int sizeNou)
+	{
+		if (cantitateNoua != nullptr && sizeNou > 0)
+		{
+			this->size = sizeNou;
+			this->cantitate = new int[sizeNou];
+			for (int i = 0; i < sizeNou; i++)
+				this->cantitate[i] = cantitateNoua[i];
+		}
+		else
+			throw exception("nu exista cantitate");
+	}
+
+	void afisare_ingrediente()
+	{
+		cout << "\n--------------------------------------";
+		if (getdenumire() != nullptr)
+			cout << "\n Denumirea ingredientelor este=" << getdenumire();
+		else
+			cout << "\n Denumire=-";
+
+		if (getsize() >= 0)
+			cout << "\n Numarul de ingrediente:" << getsize();
+		else
+			cout << "\n Numarul de ingrediente=-";
+		if (getcantitate() != nullptr && getsize() > 0)
+		{
+			cout << "\n Cantitatile ingredientelor=";
+			for (int i = 0; i < getsize(); i++)
+				cout << getcantitate()[i] << " ";
+		}
+		else
+			cout << "\n nu exista ingrediente";
+	}
+
+	//operatorul de comparatie ==
+	bool operator==(const StocIngrediente& s)
+	{
+		if (this->cantitate != s.cantitate)
+			return false;
+		if (this->denumire != s.denumire)
+			return false;
+
+		return true;
+	}
+
+	bool operator>(const StocIngrediente& s)
+	{
+		if (this->cantitate != nullptr && s.cantitate != nullptr)
+		{
+			if (this->cantitate[this->size - 1] > s.cantitate[s.size - 1])
+				return true;
+			return false;
+		}
+		else
+			throw exception("eroare");
+	}
+
+	friend ostream& operator<<(ostream& out, const StocIngrediente& i)
+	{
+		out << "\n--------------------------------------";
+		if (i.denumire != nullptr && strlen(i.denumire) > 0)
+			out << "\n Denumirea ingredientelor=" << i.denumire;
+		else
+			out << "\n denumire=-";
+		if (i.size > 0)
+			out << "\n Numarul de ingrediente:" << i.size;
+		else
+			out << "\n nu exista ingrediente";
+		if (i.size > 0 && i.cantitate != nullptr)
+		{
+			out << "\n Cantitatea fiecarui ingredient=";
+			for (int j = 0; j < i.size; j++)
+				out << i.cantitate[j] << " grame  ";
+		}
+		else
+			out << "\n nu exista ingrediente";
+
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, StocIngrediente& i)
+	{
+		delete[] i.denumire;
+		i.denumire = nullptr;
+		delete[] i.cantitate;
+		i.cantitate = nullptr;
+
+		cout << "\n denumire=";
+		string buffer;
+		in >> buffer;
+		i.denumire = new char[buffer.size() + 1];
+		strcpy(i.denumire, buffer.data());
+
+		cout << "\n Lungimea vectorului=";
+		in >> i.size;
+		if (i.size <= 0) {
+			i.size = 0;
+			i.cantitate = nullptr;
+		}
+		else
+		{
+			i.cantitate = new int[i.size];
+			cout << "\n Cantitatile fiecarui ingredient";
+			for (int j = 0; j < i.size; j++)
+			{
+				cout << "cantitati[" << i << "]=";
+				in >> i.cantitate[j];
+			}
+		}
+		return in;
+	}
+
+	void scade(int* cantitateScazuta, int sizeCantitate)
+	{
+		if (cantitateScazuta != nullptr && sizeCantitate > 0)
+		{
+			for (int i = 0; i < sizeCantitate; i++)
+			{
+				if (i < this->size)
+				{
+					this->cantitate[i] -= cantitateScazuta[i];
+					if (this->cantitate[i] < 0)
+						this->cantitate[i] = 0;
+				}
+			}
+		}
+		else
+			throw exception("cantitati invalide");
+	}
+};
+class Preparat
+{
+	string nume = "necunoscut";
+	int numarIngrediente = 0;
+	StocIngrediente* stoculIngredientelor;
+
+public:
+
+	Preparat()
+	{
+		this->nume = "necunoscut";
+		this->numarIngrediente = 0;
+		this->stoculIngredientelor = nullptr;
+
+	}
+
+	Preparat(string nume)
+	{
+		if (nume != " " && nume.length() > 0)
+			this->nume = nume;
+		else
+			this->nume = "necunoscut";
+
+
+		if (stoculIngredientelor != nullptr && numarIngrediente > 0)
+		{
+			this->numarIngrediente = numarIngrediente;
+			this->stoculIngredientelor = new StocIngrediente[numarIngrediente];
+			for (int i = 0; i < numarIngrediente; i++)
+				this->stoculIngredientelor[i] = stoculIngredientelor[i];
+		}
+		else
+		{
+			this->numarIngrediente = 0;
+			this->stoculIngredientelor = nullptr;
+		}
+
+	}
+	Preparat(string nume, int numarIngrediente, StocIngrediente* stoculIngredientelor)
+	{
+		if (nume != " " && nume.length() > 0)
+			this->nume = nume;
+		else
+			this->nume = "necunoscut";
+
+		if (stoculIngredientelor != nullptr && numarIngrediente > 0)
+		{
+			this->numarIngrediente = numarIngrediente;
+			this->stoculIngredientelor = new StocIngrediente[numarIngrediente];
+			for (int i = 0; i < numarIngrediente; i++)
+				this->stoculIngredientelor[i] = stoculIngredientelor[i];
+		}
+		else
+		{
+			this->numarIngrediente = 0;
+			this->stoculIngredientelor = nullptr;
+		}
+
+
+	}
+	Preparat(const Preparat& p)
+	{
+		if (p.nume != " " && p.nume.length() > 0)
+			this->nume = p.nume;
+		else
+			this->nume = "necunoscut";
+
+
+		if (p.stoculIngredientelor != nullptr && p.numarIngrediente > 0)
+		{
+			this->numarIngrediente = p.numarIngrediente;
+			this->stoculIngredientelor = new StocIngrediente[p.numarIngrediente];
+			for (int i = 0; i < p.numarIngrediente; i++)
+				this->stoculIngredientelor[i] = p.stoculIngredientelor[i];
+		}
+		else
+		{
+			this->numarIngrediente = 0;
+			this->stoculIngredientelor = nullptr;
+		}
+	}
+	~Preparat()
+	{
+		delete[] this->stoculIngredientelor;
+	}
+
+	Preparat operator=(const Preparat& p)
+	{
+		if (this != &p)
+		{
+			delete[] this->stoculIngredientelor;
+
+			if (p.nume != " " && p.nume.length() > 0)
+				this->nume = p.nume;
+			else
+				this->nume = "necunoscut";
+			if (p.stoculIngredientelor != nullptr && p.numarIngrediente > 0)
+			{
+				this->stoculIngredientelor = new StocIngrediente[p.numarIngrediente];
+				for (int i = 0; i < p.numarIngrediente; i++)
+					this->stoculIngredientelor[i] = p.stoculIngredientelor[i];
+			}
+
+			else
+			{
+				this->numarIngrediente = 0;
+				this->stoculIngredientelor = nullptr;
+			}
+		}
+		return *this;
+	}
+
+	void afisare_preparat()
+	{
+		cout << "\n----------------------------";
+		if (getnume() != " ")
+			cout << "\n Numele preparatului :" << getnume();
+		else
+			cout << "\n Numele preparatului=-";
+		if (getnumarIngrediente() > 0)
+			cout << "\n numarul de  ingrediente" << getnumarIngrediente();
+		else
+			cout << "\n Numarul de ingrediente=-";
+		if (getnumarIngrediente() > 0 && getstoculIngredientelor() != nullptr)
+		{
+			cout << "\n Stocul ingredienetele folosite";
+			for (int i = 0; i < getnumarIngrediente(); i++)
+				cout << getstoculIngredientelor()[i] << " ";
+		}
+		else
+			cout << "\n nu exista ingrediente";
+	}
+
+	friend ostream& operator<<(ostream& out, const Preparat& p)
+	{
+		out << "\n----------------------------";
+		if (p.nume != " " && p.nume.length() > 0)
+			out << "\n Numele preparatului :" << p.nume;
+		else
+			out << "\n Numele preparatului=-";
+		if (p.numarIngrediente > 0)
+			out << "\n Numarul de ingrediente=" << p.numarIngrediente;
+		else
+			out << "\n Numarul de ingrediente=-";
+		if (p.numarIngrediente >= 0 && p.stoculIngredientelor != nullptr)
+		{
+			out << "\n Stocul de ingrediente pentru preparatul=" << p.nume;
+			for (int i = 0; i < p.numarIngrediente; i++)
+				out << p.stoculIngredientelor[i] << " ";
+		}
+		else
+			out << "\n nu avem stoc";
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Preparat& p)
+	{
+		delete[] p.stoculIngredientelor;
+		p.stoculIngredientelor = nullptr;
+		cout << "\n----------------------------";
+		cout << "\n Numele preparatului :";
+		in >> p.nume;
+		if (p.nume == " ")
+			p.nume = "necunoscut";
+		cout << "\n numarul stocului";
+		in >> p.numarIngrediente;
+		if (p.numarIngrediente > 0)
+		{
+			p.numarIngrediente = 0;
+			p.stoculIngredientelor = nullptr;
+		}
+		else
+		{
+			p.stoculIngredientelor = new StocIngrediente[p.numarIngrediente];
+			cout << "\n Ingredientele";
+			for (int i = 0; i < p.numarIngrediente; i++)
+				in >> p.stoculIngredientelor[i];
+		}
+		return in;
+	}
+
+	string getnume()
+	{
+		return this->nume;
+	}
+
+	void setnume(string numeNou)
+	{
+		if (sizeof(numeNou) >= 5)
+			this->nume = numeNou;
+	}
+
+
+	int getnumarIngrediente()
+	{
+		return this->numarIngrediente;
+	}
+
+	void setnumarIgrediete(int numarnou)
+	{
+		if (numarnou > 0)
+			this->numarIngrediente = numarnou;
+	}
+
+	StocIngrediente* getstoculIngredientelor()
+	{
+		return this->stoculIngredientelor;
+	}
+
+	void setstoculIngredientelor(StocIngrediente* stoc, int nr)
+	{
+		if (stoc != nullptr && nr > 0)
+		{
+			this->numarIngrediente = nr;
+			this->stoculIngredientelor = new StocIngrediente[nr];
+			for (int i = 0; i < nr; i++)
+				this->stoculIngredientelor[i] = stoc[i];
+		}
+		else
+			throw exception("\n eroare accesare");
+	}
+
+
+
+	//operator!=
+	bool operator!=(const Preparat& p)
+	{
+		if (this->nume != p.nume)
+			return true;
+		if (this->numarIngrediente != p.numarIngrediente)
+			return true;
+		return false;
+	}
+};
+class Meniu
+{
+	string* preparate = nullptr;
+	int cantitate = 0;
+	int nrPreparate = 0;
+	Preparat** preparateDetaliate = nullptr;  //relatie cu clasa preparat
+public:
+	Meniu()
+	{
+		this->preparate = nullptr;
+		this->cantitate = 0;
+		this->nrPreparate = 0;
+		this->preparateDetaliate = nullptr;
+	}
+
+	Meniu(string* preparate, int nrPreparate)
+	{
+		if (preparate != nullptr && nrPreparate > 0)
+		{
+			this->nrPreparate = nrPreparate;
+			this->preparate = new string[nrPreparate];
+			for (int i = 0; i < nrPreparate; i++)
+				this->preparate[i] = preparate[i];
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->preparate = nullptr;
+		}
+		if (cantitate > 0)
+			this->cantitate = cantitate;
+		else
+			this->cantitate = 0;
+		if (preparateDetaliate != nullptr && nrPreparate > 0)
+		{
+			this->nrPreparate = nrPreparate;
+			this->preparateDetaliate = new Preparat * [this->nrPreparate];
+			for (int i = 0; i < this->nrPreparate; i++)
+				this->preparateDetaliate[i] = new Preparat(*preparateDetaliate[i]);
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->preparateDetaliate = nullptr;
+		}
+	}
+
+	Meniu(string* preparate, int cantitate, int nrPreparate, Preparat** preparateDetaliate)
+	{
+		if (preparate != nullptr && nrPreparate > 0)
+		{
+			this->nrPreparate = nrPreparate;
+			this->preparate = new string[nrPreparate];
+			for (int i = 0; i < nrPreparate; i++)
+				this->preparate[i] = preparate[i];
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->preparate = nullptr;
+		}
+
+		if (cantitate > 0)
+			this->cantitate = cantitate;
+		else
+			this->cantitate = 0;
+		if (preparateDetaliate != nullptr && nrPreparate > 0)
+		{
+			this->nrPreparate = nrPreparate;
+			this->preparateDetaliate = new Preparat * [this->nrPreparate];
+			for (int i = 0; i < this->nrPreparate; i++)
+				this->preparateDetaliate[i] = new Preparat(*preparateDetaliate[i]);
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->preparateDetaliate = nullptr;
+		}
+	}
+
+	Meniu(const Meniu& m)
+	{
+		if (m.preparate != nullptr && m.nrPreparate > 0)
+		{
+			this->nrPreparate = m.nrPreparate;
+			this->preparate = new string[nrPreparate];
+			for (int i = 0; i < nrPreparate; i++)
+				this->preparate[i] = m.preparate[i];
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->preparate = nullptr;
+		}
+
+		if (m.cantitate > 0)
+			this->cantitate = m.cantitate;
+		else
+			this->cantitate = 0;
+		if (m.preparateDetaliate != nullptr && m.nrPreparate > 0)
+		{
+			this->nrPreparate = m.nrPreparate;
+			this->preparateDetaliate = new Preparat * [this->nrPreparate];
+			for (int i = 0; i < this->nrPreparate; i++)
+				this->preparateDetaliate[i] = new Preparat(*m.preparateDetaliate[i]);
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->preparateDetaliate = nullptr;
+		}
+	}
+
+	~Meniu()
+	{
+		delete[] preparate;
+		this->preparate = nullptr;
+		delete[] this->preparateDetaliate;
+	}
+
+	Meniu& operator=(const Meniu& m)
+	{
+		if (this != &m)
+		{
+			delete[] preparate;
+			this->preparate = nullptr;
+			delete[] this->preparateDetaliate;
+			if (m.preparate != nullptr && m.nrPreparate > 0)
+			{
+				this->nrPreparate = m.nrPreparate;
+				this->preparate = new string[nrPreparate];
+				for (int i = 0; i < nrPreparate; i++)
+					this->preparate[i] = m.preparate[i];
+			}
+			else
+			{
+				this->nrPreparate = 0;
+				this->preparate = nullptr;
+			}
+
+			if (m.cantitate > 0)
+				this->cantitate = m.cantitate;
+			else
+				this->cantitate = 0;
+			if (m.preparateDetaliate != nullptr && m.nrPreparate > 0)
+			{
+				this->nrPreparate = m.nrPreparate;
+				this->preparateDetaliate = new Preparat * [this->nrPreparate];
+				for (int i = 0; i < this->nrPreparate; i++)
+					this->preparateDetaliate[i] = new Preparat(*m.preparateDetaliate[i]);
+			}
+			else
+			{
+				this->nrPreparate = 0;
+				this->preparateDetaliate = nullptr;
+			}
+		}
+		return *this;
+	}
+
+	explicit operator int()
+	{
+		return  this->cantitate;
+	}
+
+	int getcantitate()
+	{
+		return this->cantitate;
+
+	}
+
+	void setcantitate(int cantitate_noua)
+	{
+		if (cantitate_noua > 0)
+		{
+			this->cantitate = cantitate_noua;
+		}
+		else
+			throw exception("\n cantitate invalida");
+	}
+
+	int getnrPreparate()
+	{
+		return this->nrPreparate;
+	}
+
+	void setnrPreparate(int nrPreparate_noi)
+	{
+		if (nrPreparate_noi > 0)
+			this->nrPreparate = nrPreparate_noi;
+		else
+			throw exception(" numarul de preparate este invalid");
+	}
+
+	string* getpreparate()
+	{
+		return this->preparate;
+	}
+
+	void setpreparate(string* preparateNoi, int nrPreparateNoi)
+	{
+		if (preparate != nullptr)
+			delete[] preparate;
+		if (preparateNoi != nullptr && nrPreparateNoi > 0)
+		{
+			this->nrPreparate = nrPreparateNoi;
+			this->preparate = new string[nrPreparateNoi];
+			for (int i = 0; i < nrPreparateNoi; i++)
+				this->preparate[i] = preparateNoi[i];
+		}
+		else
+			throw exception("\n eroare");
+	}
+
+	const string getNumePreparat(int index)const
+	{
+		if (index >= 0 && index < nrPreparate)
+		{
+			return preparate[index];
+		}
+		else
+			throw exception("\n Eroare");
+	}
+
+	Preparat** getpreparateDetaliate()
+	{
+		return this->preparateDetaliate;
+	}
+
+	void setpreparateDetaliate(Preparat* preparate, int nrPrepNoi)
+	{
+		if (nrPrepNoi > 0 && preparate != nullptr)
+		{
+			this->nrPreparate = nrPrepNoi;
+			this->preparateDetaliate = new Preparat * [nrPrepNoi];
+			for (int i = 0; i < nrPrepNoi; i++)
+				this->preparateDetaliate[i] = new Preparat(preparate[i]);
+		}
+	}
+
+	void scadeStoc(int cantitateScazuta)
+	{
+		if (cantitateScazuta > 0)
+		{
+			cantitate -= cantitateScazuta;
+		}
+		if (cantitate < 0)
+			cantitate = 0;
+	}
+
+	void afisare_meniu()
+	{
+		cout << "\n---------------------------------------";
+		if (getcantitate() > 0)
+			cout << "\n cantitatea produselor:" << cantitate;
+		else
+			cout << "\n cantitatea produselor=-";
+		if (getnrPreparate() > 0)
+		{
+			cout << "\n Numarul de preparate din meniu:" << nrPreparate;
+			cout << "\n PREPARATE:";
+			for (int i = 0; i < nrPreparate; i++)
+				cout << preparate[i];
+			cout << "preparatele detaliate:";
+			for (int i = 0; i < nrPreparate; i++)
+				cout << preparateDetaliate[i];
+		}
+		else
+			cout << "\npreparate=-";
+	}
+
+	friend ostream& operator<<(ostream& out, const Meniu& m)
+	{
+		out << "\n---------------------------------------";
+		if (m.cantitate > 0)
+			out << "\n cantitatea produselor:" << m.cantitate;
+		else
+			out << "\n cantitatea produselor=-";
+
+		if (m.nrPreparate >= 0 && m.preparate != nullptr)
+		{
+			out << "\n Numarul de preparate din meniu:" << m.nrPreparate;
+			out << "\n PREPARATE:";
+			for (int i = 0; i < m.nrPreparate; i++)
+				out << m.preparate[i] << " ";
+		}
+		else
+			out << "\nNumarul de preparate din meniu=-";
+		if (m.nrPreparate > 0 && m.preparateDetaliate != nullptr)
+		{
+			out << "\n Preparate detaliate=";
+			for (int i = 0; i < m.nrPreparate; i++)
+				out << *m.preparateDetaliate[i] << " ";
+		}
+		else
+			out << "\n Preparate detaliate=-";
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Meniu& m)
+	{
+		delete[] m.preparate;
+		m.preparate = nullptr;
+		delete[] m.preparateDetaliate;
+		m.preparateDetaliate = nullptr;
+		cout << "\n---------------------------------------";
+		cout << "\n cantitatea produselor:";
+		in >> m.cantitate;
+		if (m.cantitate < 0)
+			m.cantitate = 0;
+		cout << "\n Numarul de preparate din meniu:";
+		in >> m.nrPreparate;
+		if (m.nrPreparate < 0)
+		{
+			m.nrPreparate = 0;
+			m.preparate = nullptr;
+			m.preparateDetaliate = nullptr;
+		}
+		else
+		{
+			m.preparate = new string[m.nrPreparate];
+			cout << "\n PREPARATE:";
+			in.ignore();
+			for (int i = 0; i < m.nrPreparate; i++)
+			{
+				cout << "\n preparatul =" << i + 1 << " ";
+				getline(in, m.preparate[i]);
+			}
+
+			/*m.preparateDetaliate = new Preparat*[m.nrPreparate];
+			cout << "\n Preparatul detaliat";
+			for (int i = 0; i < m.nrPreparate; i++)
+			{
+				cout << "\n preparat detaliat=" << i + 1 << " ";
+				in >> new Preparat(m.preparate[i]);
+			}*/
+
+		}
+		return in;
+	}
+	/*void addPreparat(string preparatNou)
+	{
+
+			string* aux = new string[nrPreparate + 1];
+			for (int i = 0; i < nrPreparate; i++)
+				aux[i] = preparate[i];
+			aux[nrPreparate] = preparatNou;
+			delete[] preparate;
+			preparate = aux;
+			nrPreparate++;
+	}*/
+
+	Meniu  operator+(int CantitateSuplimentara)
+	{
+		if (cantitate > 0)
+		{
+			Meniu temp = *this;
+			temp.cantitate += CantitateSuplimentara;
+			return temp;
+		}
+		else
+			throw exception("\n Eroare");
+	}
+};
+class Comenzi
+{
+	const int id = 0;
+	string* nume_preparat = nullptr;
+	int nrPreparate = 0;
+	int nrComenzi = 0;
+	Meniu meniu;
+	StocIngrediente ingrediente;
+public:
+	Comenzi(int id) :id(id)
+	{
+		this->nume_preparat = nullptr;
+		this->nrPreparate = 0;
+		this->nrComenzi = 0;
+		this->meniu;
+	}
+
+	Comenzi(int id, string* nume_preparat, int nrPreparate, int nrComenzi) :id(id), meniu(nullptr, 0, 0, 0), ingrediente(nullptr, 0, 0)
+	{
+
+		if (nume_preparat != nullptr && nrPreparate > 0)
+		{
+			this->nrPreparate = nrPreparate;
+			this->nume_preparat = new string[nrPreparate];
+			for (int i = 0; i < nrPreparate; i++)
+				this->nume_preparat[i] = nume_preparat[i];
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->nume_preparat = nullptr;
+		}
+		if (nrComenzi > 0)
+			this->nrComenzi = nrComenzi;
+		else
+			this->nrComenzi = 0;
+	}
+	Comenzi(int id, string* nume_preparat, int nrPreparate, int nrComenzi, Preparat* preparateComandate) :id(id), meniu(nullptr, 0, 0, 0), ingrediente(nullptr, 0, 0)
+	{
+		if (nume_preparat != nullptr && nrPreparate > 0)
+		{
+			this->nrPreparate = nrPreparate;
+			this->nume_preparat = new string[nrPreparate];
+			for (int i = 0; i < nrPreparate; i++)
+				this->nume_preparat[i] = nume_preparat[i];
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->nume_preparat = nullptr;
+		}
+		if (nrComenzi > 0)
+			this->nrComenzi = nrComenzi;
+		else
+			this->nrComenzi = 0;
+	}
+
+	Comenzi(const Comenzi& c) :id(c.id), meniu(nullptr, 0, 0, 0), ingrediente(nullptr, 0, 0)
+	{
+		if (c.nume_preparat != nullptr && c.nrPreparate > 0)
+		{
+			this->nrPreparate = c.nrPreparate;
+			this->nume_preparat = new string[nrPreparate];
+			for (int i = 0; i < nrPreparate; i++)
+				this->nume_preparat[i] = c.nume_preparat[i];
+		}
+		else
+		{
+			this->nrPreparate = 0;
+			this->nume_preparat = nullptr;
+		}
+		if (c.nrComenzi > 0)
+			this->nrComenzi = c.nrComenzi;
+		else
+			this->nrComenzi = 0;
+	}
+
+	Comenzi& operator=(const Comenzi& c)
+	{
+		if (this != &c)
+		{
+			delete[] nume_preparat;
+			this->nume_preparat = nullptr;
+
+			if (c.nume_preparat != nullptr && c.nrPreparate > 0)
+			{
+				this->nrPreparate = c.nrPreparate;
+				this->nume_preparat = new string[nrPreparate];
+				for (int i = 0; i < nrPreparate; i++)
+					this->nume_preparat[i] = c.nume_preparat[i];
+			}
+			else
+			{
+				this->nrPreparate = 0;
+				this->nume_preparat = nullptr;
+			}
+			if (c.nrComenzi > 0)
+				this->nrComenzi = c.nrComenzi;
+			else
+				this->nrComenzi = 0;
+
+		}
+		return *this;
+	}
+
+	const string* getnume_preparatt()
+	{
+		return this->nume_preparat;
+	}
+
+	const string  getnume_preparat(int index) const
+	{
+		if (index >= 0 && index < nrPreparate)
+			return this->nume_preparat[index];
+		else
+			throw exception("\n **********");
+	}
+
+	int getnrPreparate()
+	{
+		return this->nrPreparate;
+	}
+
+	void setnume_preparat(string* nume_preparat_nou, int nrPreparatenoi)
+	{
+		if (nume_preparat != nullptr)
+			delete[] nume_preparat;
+		if (nume_preparat_nou != nullptr && nrPreparatenoi > 0)
+		{
+			this->nrPreparate = nrPreparatenoi;
+			this->nume_preparat = new string[nrPreparatenoi];
+			for (int i = 0; i < nrPreparatenoi; i++)
+				this->nume_preparat[i] = nume_preparat_nou[i];
+		}
+		else
+			throw exception("\n numar de preparate invalid");
+	}
+
+	int getnrComenzi()
+	{
+		return this->nrComenzi;
+	}
+
+	void setnrComenzi(int nrComenzinoi)
+	{
+		if (nrComenzinoi > 0)
+			this->nrComenzi = nrComenzinoi;
+	}
+
+	void addComanda(string  ComandaNoua)
+	{
+		if (ComandaNoua != " " && (this->nrPreparate == 0 || (ComandaNoua != this->nume_preparat[this->nrPreparate - 1])))
+		{
+			Comenzi  c = *this;
+			delete[] this->nume_preparat;
+			this->nrPreparate++;
+			this->nume_preparat = new string[this->nrPreparate];
+			for (int i = 0; i < this->nrPreparate; i++)
+				this->nume_preparat[i] = c.nume_preparat[i];
+			this->nume_preparat[this->nrPreparate - 1] = ComandaNoua;
+		}
+	}
+
+	// pre-incrementare  -- operator--
+	Comenzi& operator--()
+	{
+		nrComenzi--;
+		return *this;
+	}
+
+	//pre-incrementare  -- operator++
+	Comenzi& operator++()
+	{
+		nrComenzi++;
+		return *this;
+	}
+
+	void adaugaComanda(Meniu& meniu, int index)
+	{
+		if (index > 0 && index < meniu.getnrPreparate())
+		{
+			string preparatNou = meniu.getNumePreparat(index);
+			addComanda(preparatNou);
+			meniu.scadeStoc(index);
+		}
+		else
+			cout << "\n Index invalid";
+	}
+
+	bool verifica_stoc(Meniu& meniu, StocIngrediente& ingrediente, int index)
+	{
+		if (index >= 0 && index < meniu.getnrPreparate())
+		{
+			int   cantitateDisp = ingrediente.getCantitate(index);
+			if (cantitateDisp > 0)
+			{
+				cout << "\n Avem stoc disponibil pentru=" << meniu.getNumePreparat(index);
+				return true;
+			}
+			else
+				cout << "\n Stoc epuizat pentru =" << meniu.getNumePreparat(index);
+			return false;
+		}
+		else
+		{
+			cout << "\n Index invalid";
+			return false;
+		}
+	}
+	void afisare_comenzi()
+	{
+		cout << "\n -----------------------------";
+		cout << "\n ID-ul comenzii este:" << id;
+		if (nrComenzi > 0)
+			cout << "\n Numarul de comenzii plasate:" << nrComenzi;
+		else
+			cout << "\n numarul de comenzi=-";
+		cout << "\n Numele preparatului este";
+		if (nume_preparat != nullptr && nrPreparate > 0)
+		{
+			for (int i = 0; i < nrPreparate; i++)
+				cout << nume_preparat[i] << " ";
+		}
+		else
+			cout << "\nnumele preparatului= --";
+	}
+
+	~Comenzi()
+	{
+		delete[] nume_preparat;
+		this->nume_preparat = nullptr;
+	}
+
+	friend ostream& operator<<(ostream& out, const Comenzi& c)
+	{
+
+		out << "\n ID ul comenzi este=" << c.id;
+		if (c.nrPreparate > 0)
+			out << "\n Numarul de preparate=" << c.nrPreparate;
+		else
+			out << "\n numarul de preparate=-";
+		if (c.nrPreparate > 0 && c.nume_preparat != nullptr)
+		{
+			out << "\n Numele preparatului:";
+			for (int i = 0; i < c.nrPreparate; i++)
+				out << c.nume_preparat[i] << " ";
+		}
+		else
+			out << "\nnumele preparatului= --";
+		if (c.nrComenzi > 0)
+			out << "\n Numarul de comenzi=" << c.nrComenzi;
+		else
+			out << "\n numarul de comenzi=-";
+		//out << "\n Meniu" << c.meniu;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Comenzi& c)
+	{
+		delete[] c.nume_preparat;
+		c.nume_preparat = nullptr;
+		cout << "\n Numarul de preparate=";
+		in >> c.nrPreparate;
+		if (c.nrPreparate < 0)
+		{
+			c.nrPreparate = 0;
+			c.nume_preparat = nullptr;
+		}
+		else
+		{
+			in.ignore(); //consuma randul nou lasat de >>
+			c.nume_preparat = new string[c.nrPreparate];
+			cout << "\n Numele preparatului=";
+			for (int i = 0; i < c.nrPreparate; ++i)
+			{
+				in >> c.nume_preparat[i];
+			}
+		}
+		cout << "\n Numarul de comenzi=";
+		in >> c.nrComenzi;
+		if (c.nrComenzi < 0)
+			c.nrComenzi = 0;
+
+		return in;
+	}
+};
+class ExceptieImput
+{
+	string mesaj;
+public:
+	ExceptieImput(string mesaj) :mesaj(mesaj) {}
+
+	string getMesaj()
+	{
+		return this->mesaj;
+	}
+};
+class Restaurant
+{
+	string nume_rest = "necunoscut";
+	int nrscaune = 0;
+	int* mese = nullptr;
+	static int  anDeschidere;
+	StocIngrediente ingrediente;
+	Meniu meniu;
+
+public:
+
+	Restaurant()
+	{
+		this->nume_rest = "necunoscut";
+		this->nrscaune = 0;
+		this->mese = nullptr;
+		this->anDeschidere;
+		this->ingrediente;
+		this->meniu;
+
+	}
+
+	Restaurant(string nume_rest) :ingrediente(0, 0), meniu(nullptr, 0, 0, 0)
+	{
+		if (nume_rest != " " && nume_rest.length() > 0)
+			this->nume_rest = nume_rest;
+		else
+			this->nume_rest = "necunoscut";
+
+		if (mese != nullptr && nrscaune > 0)
+		{
+			this->nrscaune = nrscaune;
+			this->mese = new int[nrscaune];
+			for (int i = 0; i < nrscaune; i++)
+				this->mese[i] = mese[i];
+		}
+		else
+		{
+			this->mese = nullptr;
+			this->nrscaune = 0;
+		}
+	}
+
+	Restaurant(string nume_rest, int nrscaune, int* mese) :ingrediente(nullptr, 0), meniu(nullptr, 0, 0, 0)
+	{
+		if (nume_rest != " " && nume_rest.length() > 0)
+			this->nume_rest = nume_rest;
+		else
+			this->nume_rest = "necunoscut";
+
+		if (mese != nullptr && nrscaune > 0)
+		{
+			this->nrscaune = nrscaune;
+			this->mese = new int[nrscaune];
+			for (int i = 0; i < nrscaune; i++)
+				this->mese[i] = mese[i];
+		}
+		else
+		{
+			this->mese = nullptr;
+			this->nrscaune = 0;
+		}
+	}
+
+	Restaurant(const Restaurant& r) :ingrediente(0, 0), meniu(nullptr, 0, 0, 0)
+	{
+		if (r.nume_rest != " " && r.nume_rest.length() > 0)
+			this->nume_rest = r.nume_rest;
+		else
+			this->nume_rest = "necunoscut";
+
+		if (r.mese != nullptr && r.nrscaune > 0)
+		{
+			this->nrscaune = r.nrscaune;
+			this->mese = new int[nrscaune];
+			for (int i = 0; i < nrscaune; i++)
+				this->mese[i] = r.mese[i];
+		}
+		else
+		{
+			this->mese = nullptr;
+			this->nrscaune = 0;
+		}
+	}
+
+	static int getanDeschidere()
+	{
+		return anDeschidere;
+	}
+
+	void setanDeschidere(int anDeschidere)
+	{
+		if (anDeschidere > 2020)
+			Restaurant::anDeschidere = anDeschidere;
+	}
+
+	string getnume_rest()
+	{
+		return this->nume_rest;
+	}
+
+	void setnume_rest(string numenou)
+	{
+		if (numenou.length() >= 3 && numenou.length() <= 30)
+		{
+			nume_rest = numenou;
+		}
+		else
+		{
+			throw exception("/n Numele va ramane cel initial,numele sugerat nu respecta conditiile!");
+		}
+	}
+
+
+	int getnrscaune()
+	{
+		return this->nrscaune;
+	}
+	int* getmese()
+	{
+		return this->mese;
+	}
+
+	void setmese(int* mesenoi, int nrscaunenoi)
+	{
+		if (mesenoi != nullptr && nrscaunenoi > 0)
+		{
+			delete[] mese;
+			mese = nullptr;
+			this->mese = new int[nrscaunenoi];
+			for (int i = 0; i < nrscaunenoi; i++)
+				this->mese[i] = mesenoi[i];
+
+			this->nrscaune = nrscaunenoi;
+		}
+		else
+			throw exception("\n numar de mese invalid");
+	}
+
+	void afisare_rest()
+	{
+		cout << "\n--------------------------------------";
+		if (nume_rest != " " && nume_rest.length() > 0)
+			cout << "\n Numele restaurantului:" << getnume_rest();
+		else
+			cout << "\n numele=-";
+		if (nrscaune > 0)
+			cout << "\n Numarul de scaune din restaurant=" << getnrscaune();
+		else
+			cout << "\nNumar sacune=-";
+		if (nrscaune > 0 && mese != nullptr)
+		{
+			cout << "\n Numarul de mese";
+			for (int i = 0; i < nrscaune; i++)
+				cout << mese[i] << " ";
+		}
+		cout << "Anul deschiderii restaurantului:" << getanDeschidere();
+	}
+
+	//operator[]
+	int operator[](int index)
+	{
+		if (index >= 1 && index < this->nrscaune)
+		{
+			if (this->mese != nullptr) {
+				return this->mese[index];
+			}
+		}
+		return -1;
+	}
+
+	~Restaurant()
+	{
+		delete[] mese;
+		this->mese = nullptr;
+	}
+
+	Restaurant& operator=(const Restaurant& r)
+	{
+		if (this != &r)
+		{
+			delete[] mese;
+			this->mese = nullptr;
+
+			if (r.nume_rest != " " && r.nume_rest.length() > 0)
+				this->nume_rest = r.nume_rest;
+			else
+				this->nume_rest = "necunoscut";
+
+			if (r.mese != nullptr && r.nrscaune > 0)
+			{
+				this->nrscaune = r.nrscaune;
+				this->mese = new int[nrscaune];
+				for (int i = 0; i < nrscaune; i++)
+					this->mese[i] = r.mese[i];
+			}
+			else
+			{
+				this->mese = nullptr;
+				this->nrscaune = 0;
+			}
+		}
+		return *this;
+	}
+
+	friend ostream& operator<<(ostream& out, const Restaurant& r)
+	{
+		out << "\n--------------------------------------";
+		if (r.nume_rest != " ")
+			out << "\n Numele restaurantului:" << r.nume_rest;
+		else
+			out << "\n nume restuarant=-";
+		if (r.nrscaune > 0)
+			out << "\n Numarul de scaune din restaurant=" << r.nrscaune;
+		else
+			out << "\n numar de scaune=-";
+		if (r.nrscaune > 0 && r.mese != nullptr)
+		{
+			out << "\n Numarul de mese";
+			for (int i = 0; i < r.nrscaune; i++)
+				cout << r.mese[i] << " ";
+		}
+		else
+			out << "\n mese=-";
+		out << "Anul deschiderii restaurantului:" << r.anDeschidere;
+
+		return out;
+	}
+	friend istream& operator>>(istream& in, Restaurant& r)
+	{
+
+		delete[] r.mese;
+		r.mese = nullptr;
+		cout << "\n--------------------------------------";
+		cout << "\n Numele restaurantului:";
+		cin >> r.nume_rest;
+		if (r.nume_rest == " ")
+			r.nume_rest = "necunoscut";
+		cout << "\n Numarul de scaune din restaurant=";
+		cin >> r.nrscaune;
+		if (r.nrscaune < 0)
+		{
+			r.nrscaune = 0;
+			r.mese = nullptr;
+		}
+		else
+		{
+			r.mese = new int[r.nrscaune];
+			cout << "\n Numarul de mese";
+			for (int i = 0; i < r.nrscaune; i++)
+			{
+				cout << "masa " << i << " ";
+				cin >> r.mese[i];
+			}
+		}
+
+		cout << "Anul deschiderii restaurantului:";
+		cin >> r.anDeschidere;
+		cout << "\n--------------------------------------";
+		return in;
+	}
+
+	//post_incremenatare
+	Restaurant operator++(int)
+	{
+		Restaurant temp = *this;
+		if (this->nrscaune > 0 && this->mese != nullptr)
+		{
+			for (int i = 0; i < this->nrscaune; i++)
+			{
+				if (this->mese[i] > 0)
+					this->mese[i]--;
+				else
+					this->mese[i]++;
+			}
+		}
+		return temp;
+	}
+
+	//operatorul cast
+	explicit operator int()
+	{
+		if (this->nrscaune == 0 && this->mese == nullptr)
+			return 0;
+		else
+		{
+			int total = 0;
+			for (int i = 0; i < this->nrscaune; i++)
+				total += this->mese[i];
+			return total;
+		}
+	}
+};
+
+int Restaurant::anDeschidere = 2020;
+
+int main()
+{
+	int cantitate1[]{ 1000,5000,4000,5000,2000,6000 };
+	const char* denumire{ "ciuperci,masline,sos,salam,cascaval,ardei" };
+	StocIngrediente stocIngredient1(denumire, cantitate1, 6);
+
+	int cantitate2[]{ 500,2000,3000,2000 };
+	const char* denumire2{ "faina,sare,paste,sos" };
+	StocIngrediente stocIngredient2(denumire2, cantitate2, 4);
+
+	int cantitate3[]{ 2000,5000,2000,1500,1000 };
+	const char* denumire3{ "ardei,ceapa,masline,rosii,ciuperci" };
+	StocIngrediente stocIngredient3(denumire3, cantitate3, 5);
+
+	Preparat p1("Pizza", 1, &stocIngredient1);
+	Preparat p2("Pasta", 1, &stocIngredient2);
+	Preparat p3("burgger", 1, &stocIngredient1);
+	Preparat p4("salata", 1, &stocIngredient3);
+	Preparat p5("pizza vegetariana ", 1, &stocIngredient3);
+
+
+	Preparat* listaa[]{ &p1,&p2,&p3,&p4,&p5 };
+	string preparate[]{ "\nPizza","\nBurgger","\nPasta","\nSalata","\nPizza vegetariana" };
+	Meniu meniu(preparate, 250, 5, listaa);
+
+
+	int mese[]{ 4,5,6,7,2 };
+	Restaurant restaurant("Restaurant ", 5, mese);
+	cout << "\n Bine ati venit la " << restaurant.getnume_rest() << "!\n";
+
+
+
+	while (true)
+	{
+		cout << "\nScrieti comanda (legenda-->pentru lista de comenzi) ";
+		string comanda;
+		cin >> comanda;
+
+		if (comanda == "legenda")
+		{
+			cout << "\n ----------------LISTA DE COMENZI-------------------------";
+			cout << "\n 1.afisareStoc --Afisare stocul de ingrediente";
+			cout << "\n 2.meniu--Afisare meniu";
+			cout << "\n 3.afisarePreparate--Afisare lista de preparate detaliat ";
+			cout << "\n 4.adauga_comanda--Adauga o coamnda noua";
+			cout << "\n 5.locuri_disponibile->Locuri disponibile in restaurant";
+			cout << "\n 6.iesire--Iesire din lista de comenzi";
+		}
+		else
+			if (comanda == "afisareStoc")
+			{
+				cout << "\n Stocul initial al ingredientelor";
+				cout << stocIngredient1;
+				cout << stocIngredient2;
+				cout << stocIngredient3;
+
+				//operatorul>
+				if (stocIngredient1 > stocIngredient2)
+					cout << "\n Stocuri  de ingrediente 1 este mai mare decat 2 ";
+				else
+					cout << "\n Stocul de ingrediente 1 nu este mai mare decat 2";
+				//opertorul ==
+				if (stocIngredient1 == stocIngredient2)
+					cout << "\n stocul de ingrediente 1 este identic cu 2";
+				else
+					cout << "\n stocul de ingrediente 1 este diferite fata de stocul  2";
+
+			}
+			else
+				if (comanda == "afisarePreparate")
+				{
+					//opertator<<
+					cout << p1;
+					cout << p2;
+					cout << p3;
+					cout << p4;
+					cout << p5;
+					cout << endl;
+					//operatorul!=
+					if (p4 != p5)
+						cout << "\n Preparatele sunt diferite";
+					else
+						cout << "\n Preparatele sunt identice";
+				}
+				else
+					if (comanda == "meniu")
+					{
+						cout << meniu;
+						//operator+
+						if (meniu.getcantitate() < 150)
+							meniu = meniu + 100;
+					}
+					else
+						if (comanda == "adauga_comanda")
+						{
+							Comenzi c2(2);
+							Comenzi c1(1);
+							//c1.adaugaComanda(meniu, 1);
+
+							cin >> c1;
+							bool verificaE = false;
+							for (int i = 0; i < meniu.getnrPreparate(); i++)
+							{
+								try {
+									string preparate = c1.getnume_preparat(i);
+									if (preparate == "pizza" || preparate == "pasta" || preparate == "salata" || preparate == "pizza" || preparate == "burgger" || preparate == "pizza vegetariana")
+									{
+										verificaE = true;
+										break;
+									}
+								}
+								catch (const exception& e)
+								{
+									cerr << e.what() << endl;
+								}
+							}
+
+							if (verificaE != true)
+								cout << "preparatul nu exista";
+							else
+							{
+								for (int i = 0; i < meniu.getnrPreparate(); i++)
+								{
+									try {
+										if (c1.getnume_preparat(i) == "pizza")
+										{
+											c1.verifica_stoc(meniu, stocIngredient1, 0);
+										}
+										else
+											if (c1.getnume_preparat(i) == "burgger")
+											{
+												c1.verifica_stoc(meniu, stocIngredient1, 1);
+											}
+											else
+												if (c1.getnume_preparat(i) == "pasta")
+												{
+													c1.verifica_stoc(meniu, stocIngredient2, 2);
+												}
+												else
+													if (c1.getnume_preparat(i) == "salata")
+													{
+														c1.verifica_stoc(meniu, stocIngredient3, 3);
+													}
+													else
+														if (c1.getnume_preparat(i) == "pizza vegetariana")
+														{
+															c1.verifica_stoc(meniu, stocIngredient3, 4);
+														}
+									}
+									catch (const exception& e)
+									{
+										cerr << e.what() << endl;
+									}
+								}
+
+								cout << "\n Comanda a fost adaugata cu succes";
+								cout << "\n Numarul de comenzi este =" << c1.getnrComenzi();
+								int cantitate[]{ 100,100,100,100,100,100 };
+								for (int i = 0; i < meniu.getnrPreparate(); i++)
+								{
+									try
+									{
+										if (c1.getnume_preparat(i) == "pizza")
+										{
+											stocIngredient1.scade(cantitate, 6);
+											cout << stocIngredient1;
+										}
+										else
+											if (c1.getnume_preparat(i) == "burgger")
+											{
+												stocIngredient1.scade(cantitate, 6);
+												cout << stocIngredient1;
+											}
+											else
+												if (c1.getnume_preparat(i) == "pasta")
+												{
+													stocIngredient2.scade(cantitate, 4);
+													cout << stocIngredient2;
+												}
+												else
+													if (c1.getnume_preparat(i) == "salata")
+													{
+														stocIngredient3.scade(cantitate, 5);
+														cout << stocIngredient3;
+													}
+													else
+														if (c1.getnume_preparat(i) == "pizza vegetariana")
+														{
+															stocIngredient3.scade(cantitate, 5);
+															cout << stocIngredient3;
+														}
+									}
+									catch (const exception& e)
+									{
+										cerr << e.what() << endl;
+									}
+								}
+
+								bool alta;
+								cout << "\nDoriti sa mai efectuati o alta comanda?(0=da,1=nu)";
+								cin >> alta;
+
+								if (alta == 0)
+								{
+									cin >> c2;
+									bool verificaE2 = false;
+									for (int i = 0; i < meniu.getnrPreparate(); i++)
+									{
+										try {
+											string preparate2 = c2.getnume_preparat(i);
+											if (preparate2 == "pizza" || preparate2 == "pasta" || preparate2 == "salata" || preparate2 == "pizza" || preparate2 == "burgger" || preparate2 == "pizza vegetariana")
+											{
+												verificaE2 = true;
+												break;
+											}
+										}
+										catch (const exception& e)
+										{
+											cerr << e.what() << endl;
+										}
+									}
+									
+
+									if (verificaE2 != true)
+										cout << "preparatul nu exista";
+									else
+									{
+										for (int i = 0; i < meniu.getnrPreparate(); i++)
+										{
+											try {
+												if (c2.getnume_preparat(i) == "pizza")
+												{
+													c2.verifica_stoc(meniu, stocIngredient1, 0);
+												}
+												if (c2.getnume_preparat(i) == "burgger")
+												{
+													c2.verifica_stoc(meniu, stocIngredient1, 1);
+												}
+												if (c2.getnume_preparat(i) == "pasta")
+												{
+													c2.verifica_stoc(meniu, stocIngredient2, 2);
+												}
+												if (c2.getnume_preparat(i) == "salata")
+												{
+													c2.verifica_stoc(meniu, stocIngredient3, 3);
+												}
+												if (c2.getnume_preparat(i) == "pizza vegetariana")
+												{
+													c2.verifica_stoc(meniu, stocIngredient3, 4);
+												}
+											}
+											catch (const exception& e)
+											{
+												cerr << e.what() << endl;
+											}
+										}
+										//operator++ (pre-incrementare)
+										c1 = ++c1;
+										cout << "\n Numarul de comenzi este =" << c1.getnrComenzi();
+										int cantitate[]{ 100,100,100,100,100,100 };
+										for (int i = 0; i < meniu.getnrPreparate(); i++)
+										{
+											try {
+												if (c2.getnume_preparat(i) == "pizza")
+												{
+													stocIngredient1.scade(cantitate, 6);
+													cout << stocIngredient1;
+												}
+												if (c2.getnume_preparat(i) == "burgger")
+												{
+													stocIngredient1.scade(cantitate, 6);
+													cout << stocIngredient1;
+												}
+												if (c2.getnume_preparat(i) == "pasta")
+												{
+													stocIngredient2.scade(cantitate, 4);
+													cout << stocIngredient2;
+												}
+												if (c2.getnume_preparat(i) == "salata")
+												{
+													stocIngredient3.scade(cantitate, 5);
+													cout << stocIngredient3;
+												}
+												if (c2.getnume_preparat(i) == "pizza vegetariana")
+												{
+													stocIngredient3.scade(cantitate, 5);
+													cout << stocIngredient3;
+												}
+											}
+											catch (const exception& e)
+											{
+												cerr << e.what() << endl;
+											}
+										}
+									}
+
+									bool anulare;
+									cout << "\n Doriti sa anulati   comannda?(0= da,1=nu)";
+									cin >> anulare;
+									if (anulare == 0)
+									{
+										//operator--
+										c1 = --c1;
+										cout << "\nComanda anulata";
+										cout << "\n Numarul de comenzi=" << c1.getnrComenzi();
+									}
+									else
+									{
+										cout << "\n Comenzi inregistrate!";
+										cout << "\n Numarul de comenzi este =" << c1.getnrComenzi();
+									}
+								}
+							}
+						}
+						else
+							if (comanda == "locuri_disponibile")
+							{
+								//opertor cast 
+								int total = (int)restaurant;
+								cout << "\n total de scaune=" << total;
+
+								//operatorul ++
+								bool dorinta;
+								cout << "\n Doriti sa mai adaugam un scaun la masa 0?  (0 = da, 1 = nu)";
+								cin >> dorinta;
+								if (dorinta == 0)
+								{
+
+									restaurant = restaurant++;
+									cout << "\n Numarul de scaune acum este=" << restaurant.getnrscaune();
+								}
+
+								//operator[]
+								int index = 0;
+								cout << "\n Introduceti masa la care doriti sa va asezati ";
+								cin >> index;
+								int retine = restaurant[index];
+
+								if (retine != -1)
+
+									cout << "\n Numarul de scaunde de la masa dorita  este=" << retine;
+								else
+									cout << "\n index invalid ";
+							}
+							else
+								if (comanda == "iesire")
+								{
+									cout << "LA REVEDERE";
+									break;
+								}
+								else
+									cout << "\nComanda neidentificata.Tastati  legenda pentru a vedea obtiunile disponibile!";
+
+	}
+	return 0;
+}
